@@ -6,8 +6,7 @@ angular.module('myApp.view1', ['ngRoute'])
   $routeProvider.when('/view1', {
     templateUrl: 'components/view1/view1.html',
     controller: 'View1Ctrl',
-    controllerAs: 'vm',
-
+    controllerAs: 'vm'
   });
 }])
 
