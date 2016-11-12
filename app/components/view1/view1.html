@@ -1,3 +1,34 @@
 <hr>
-<pre id="oren" name="oren" ng-mouseup="vm.updateSelectedText()">{{vm.text}}</pre>
+<div class="labels-db-loader" ng-if="vm.state === 0">
+    <label>
+        <textarea>{{vm.labelsDB}}</textarea>
+    </label><br>
+    <input type="button" ng-click="vm.loadLabelsDB()" value="Load labels database">
+</div>
+<div class="labels-db-loader" ng-if="vm.state === 1">
+    <label>
+        <textarea>{{vm.text}}</textarea>
+    </label><br>
+    <input type="button" ng-click="vm.loadText()" value="Load Text to be tagged">
+</div>
+<div class="labels-db-loader" ng-if="vm.state === 2">
+    <table width="100%">
+        <tr>
+            <td width="30%" valign="top">
+                <label>
+                    <input type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
+                </label>
+                <p ng-repeat="item in vm.labelsDBjsonFiltered.collection | limitTo : 4" class="tag-selector"
+                   ng-click="vm.tag(item)">
+                    {{item.labels[0].label}}
+                </p>
+             </td>
+            <td width="70%" valign="top">
+                <pre id="oren" ng-mouseup="vm.updateSelectedText()">{{vm.text}}</pre>
+            </td>
+        </tr>
+    </table>
+
+    <hr>
+</div>
 <hr>

@@ -23,3 +23,32 @@
   content: "|";
   padding-right: 0.3em;
 }
+
+.labels-db-loader {
+  text-align: center;
+  width: 100%;
+}
+
+.labels-db-loader textarea {
+  width: 500px;
+  height: 300px;
+  font-size: 10px
+
+}
+
+.labels-filter {
+  font-size: 14px;
+  direction: rtl;
+
+}
+
+.tag-selector {
+  cursor: pointer;
+  margin: 0
+}
+.tag-selector:hover{
+  cursor: pointer;
+  color: red;
+  font-weight: bold;
+  text-decoration: underline;
+}
