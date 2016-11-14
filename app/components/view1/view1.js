@@ -49,8 +49,8 @@ angular.module('myApp.view1', ['ngRoute'])
             var s = sel.getRangeAt(i).startContainer.parentNode.id;
             var e = sel.getRangeAt(i).endContainer.parentNode.id;
             // console.log(i,s,e,sel);
-            if (s == "oren") flag = 1;
-            if (flag = 1 && e == "oren" || e == "child") flag = 2;
+            if (s == "text") flag = 1;
+            if (flag = 1 && e == "text" || e == "child") flag = 2;
             if (flag == 2) {
                 vm.startOffset = sel.getRangeAt(i).startOffset;
                 vm.endOffset = sel.getRangeAt(i).endOffset;
@@ -78,6 +78,14 @@ angular.module('myApp.view1', ['ngRoute'])
     }
 
     function tag(labelObj) {
+        vm.taggedText = vm.taggedText.substring(0,vm.startOffset)
+            + '"'
+            + vm.taggedText.substring(vm.startOffset,vm.endOffset)
+            + '"'
+            + '('
+            + labelObj.labels[0].label
+            + ')'
+            + vm.taggedText.substring(vm.endOffset);
         console.log(vm.startOffset);
         console.log(vm.endOffset);
     }
@@ -178,5 +186,6 @@ angular.module('myApp.view1', ['ngRoute'])
         "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla\n" +
         "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla\n" +
         "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla";
+    vm.taggedText = vm.text;
     vm.filter = "";
 }]);

@@ -14,7 +14,10 @@
 <div class="labels-db-loader" ng-if="vm.state === 2">
     <table width="100%">
         <tr>
-            <td width="30%" valign="top">
+            <td width="40%" valign="top">
+                <pre id="taggedText">{{vm.taggedText}}</pre>
+            </td>
+            <td width="20%" valign="top">
                 <label>
                     <input type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
                 </label>
@@ -23,8 +26,8 @@
                     {{item.labels[0].label}}
                 </p>
              </td>
-            <td width="70%" valign="top">
-                <pre id="oren" ng-mouseup="vm.updateSelectedText()">{{vm.text}}</pre>
+            <td width="40%" valign="top">
+                <pre id="text" ng-mouseup="vm.updateSelectedText()">{{vm.text}}</pre>
             </td>
         </tr>
     </table>
