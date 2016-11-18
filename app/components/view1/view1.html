@@ -15,23 +15,43 @@
     <table width="100%">
         <tr>
             <td width="40%" valign="top">
-                <pre id="taggedText">{{vm.taggedText}}</pre>
+                <pre id="text" ng-mouseup="vm.updateSelectedText()" dir="rtl">{{vm.text}}</pre>
             </td>
+        </tr>
+        <tr>
             <td width="20%" valign="top">
                 <label>
                     <input type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
                 </label>
-                <p ng-repeat="item in vm.labelsDBjsonFiltered.collection | limitTo : 4" class="tag-selector"
+                <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" class="tag-selector"
                    ng-click="vm.tag(item)">
-                    {{item.labels[0].label}}
+                    {{item.titles[0].title}}
                 </p>
-             </td>
+            </td>
+        </tr>
+        <tr>
             <td width="40%" valign="top">
-                <pre id="text" ng-mouseup="vm.updateSelectedText()">{{vm.text}}</pre>
+                <pre id="taggedText" dir="rtl"><span id="{{text.id}}" ng-repeat="text in vm.taggedText" ng-class="(text.tags.length > 0) ? 'tagged' : ''" ng-mouseenter="vm.showTagsDiv($event, text)" ng-mouseleave="vm.hideTagsDiv($event,text)" ng-click="vm.freezeDiv = true">{{text.text}}</span></pre>
             </td>
         </tr>
     </table>
-
     <hr>
+</div>
+
+<div class="text-left" id="tagsDiv" style="background-color: #aa9999; color:white; padding: 10px; border-radius: 15px;visibility: hidden; position: absolute; width: 350px; height:150px; border: 1px solid; top:0; left:0">
+    <table>
+        <tr ng-repeat="tag in vm.hoveredPart.tags">
+            <td>
+                <span class="remove-tag-button" ng-click="vm.RemoveTag(tag)">x</span>
+            </td>
+            <td>
+                {{tag.titles[0].title}}
+            </td>
+        </tr>
+    </table>
+    <div  dir="rtl">
+
+
+    </div>
 </div>
 <hr>
