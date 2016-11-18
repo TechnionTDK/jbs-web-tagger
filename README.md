@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/TechnionTDK/jbs-web-tagger.svg?token=A4MyqziDyh8ckAyyzjHv&branch=master)](https://travis-ci.com/TechnionTDK/jbs-web-tagger)
+
 # jbs.tagging.frontend by angular-seed — the seed for AngularJS apps
 A Java-Script frontend for manually tagging JBS texts
 
