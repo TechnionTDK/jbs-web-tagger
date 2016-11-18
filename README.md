@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.com/TechnionTDK/jbs-web-tagger.svg?token=A4MyqziDyh8ckAyyzjHv&branch=master)](https://travis-ci.com/TechnionTDK/jbs-web-tagger)
+[![Code Climate](https://codeclimate.com/github/TechnionTDK/jbs-web-tagger/badges/gpa.svg)](https://codeclimate.com/github/TechnionTDK/jbs-web-tagger)
+[![Issue Count](https://codeclimate.com/github/TechnionTDK/jbs-web-tagger/badges/issue_count.svg)](https://codeclimate.com/github/TechnionTDK/jbs-web-tagger)
 
 # jbs.tagging.frontend by angular-seed — the seed for AngularJS apps
 A Java-Script frontend for manually tagging JBS texts
