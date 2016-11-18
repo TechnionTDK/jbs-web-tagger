@@ -52,3 +52,20 @@
   font-weight: bold;
   text-decoration: underline;
 }
+
+.tagged {
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
+  margin: 0 1px 0 1px;
+}
+
+.remove-tag-button {
+  color: black;
+  font-weight: bold;
+  border: 1px solid black;
+  border-radius: 15px;
+  padding: 5px;
+  font-size: 18px;
+  cursor: pointer;
+}
