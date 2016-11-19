@@ -37,18 +37,19 @@
 }
 
 .labels-filter {
-  font-size: 14px;
+  font-size: 25px;
   direction: rtl;
 
 }
-
 .tag-selector {
+  color: white;
+  font-size: 22px;
   cursor: pointer;
   margin: 0
 }
 .tag-selector:hover{
   cursor: pointer;
-  color: red;
+  color: #aaffff;
   font-weight: bold;
   text-decoration: underline;
 }
@@ -68,4 +69,9 @@
   padding: 5px;
   font-size: 18px;
   cursor: pointer;
+}
+
+.tags-div {
+  width: 100%; position: absolute; top: 0; left: 0; background-color: black; height: 100%; padding: 25%; opacity: 0.9
+
 }

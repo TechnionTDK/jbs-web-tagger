@@ -10,8 +10,47 @@ angular.module('myApp.view1', ['ngRoute'])
         });
     }])
 
-    .controller('View1Ctrl', ['$scope', '$http', '$document', function ($scope, $http, $document) {
+    .controller('View1Ctrl', ['$rootScope', '$scope', '$http', '$document', function ($rootScope, $scope, $http, $document) {
+
         var vm = this;
+
+        vm.isTagScreenOn = false;
+
+
+        $rootScope.down = function(e) 
+        {
+            if (e.keyCode === 84 && isSelectionValid() && !vm.isTagScreenOn)
+            {
+                showTagScreen();               
+            }
+            if (e.keyCode === 27 && isSelectionValid() && vm.isTagScreenOn)
+            {
+                closeTagScreen();
+            }
+        };
+
+
+        function showTagScreen() 
+        {
+            console.log("<show tag screen>");
+            vm.isTagScreenOn = true;
+        }
+
+        function closeTagScreen() 
+        {
+            console.log("<close tag screen>");
+            vm.isTagScreenOn = false;
+        }
+
+
+
+
+        function isSelectionValid() {
+            return vm.startOffset >= 0 && vm.endOffset >= 0;
+        }
+
+
+
         var div = $document[0].getElementById('tagsDiv');
 
         vm.activeTags = [];
@@ -84,20 +123,27 @@ angular.module('myApp.view1', ['ngRoute'])
 
         function loadText() {
             vm.state = 2;
+            for (var i in vm.taggedText)
+            {
+                vm.taggedText[i].id = "text_" + i;
+            }
         }
 
         function updateSelectedText() {
+            console.log("<updateSelectedText>")
             var flag = 0;
             var sel = window.getSelection();
             vm.startOffset = -1;
             vm.endOffset = -1;
 
             for (var i = 0; i < sel.rangeCount; i++) {
+
                 var s = sel.getRangeAt(i).startContainer.parentNode.id;
                 var e = sel.getRangeAt(i).endContainer.parentNode.id;
                 // console.log(i,s,e,sel);
-                if (s === "text") flag = 1;
-                if (flag = 1 && e === "text" || e === "child") flag = 2;
+                console.log(s)
+                if (s.startsWith("text_")) flag = 1;
+                if (flag = 1 && e.startsWith("text_") || e === "child") flag = 2;
                 if (flag === 2) {
                     vm.startOffset = sel.getRangeAt(i).startOffset;
                     vm.endOffset = sel.getRangeAt(i).endOffset;
@@ -106,6 +152,8 @@ angular.module('myApp.view1', ['ngRoute'])
             if (flag === 2) {
                 //console.log(vm.text.substring(startOffset, endOffset))
             }
+            console.log("vm.startOffset = " + vm.startOffset)
+            console.log("vm.endOffset = " + vm.endOffset)
         }
 
         function updateFilter() {
@@ -252,12 +300,14 @@ angular.module('myApp.view1', ['ngRoute'])
                         continue;
                     }
                     vm.taggedText.forEach(function (taggedText, index) {
-                        taggedText.id = "txt_" + index;
+                        taggedText.id = "text_" + index;
                     });
                     break;
                 }
 
                 vm.activeTags.push(activeTag);
+                closeTagScreen();
+
             }
         }
 
@@ -288,7 +338,7 @@ angular.module('myApp.view1', ['ngRoute'])
          * input params :    -
          * ******************************************************************************************************************/
         vm.hideTagsDiv = function (event, text) {
-            if (!vm.freezeDiv) {
+            if (!vm.freezeDiv && text.tags.length > 0) {
                 div.style.visibility = 'hidden';
                 vm.hoveredPart = {tags: []};
             }
