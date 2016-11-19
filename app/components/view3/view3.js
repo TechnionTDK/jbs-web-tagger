@@ -119,7 +119,7 @@ angular.module('myApp.view3', ['ngRoute'])
                 vm.textArray[index] =   '<span>' +
                                             char +
                                             '<sup ng-show="vm.textTags['+index+'].length > 0">' +
-                                                '<a ng-click="vm.selectedIndex='+index+'" uib-popover-template="vm.templateUrl" popover-trigger="click" popover-append-to-body="true" popover-placement="bottom">' +
+                                                '<a ng-click="vm.selectedIndex='+index+'" uib-popover-template="vm.templateUrl" popover-trigger="\'outsideClick\'" popover-append-to-body="true" popover-placement="bottom">' +
                                                     'i' +
                                                 '</a>' +
                                             '</sup>' +
@@ -169,6 +169,7 @@ angular.module('myApp.view3', ['ngRoute'])
                 title.object = titlesObj;
                 vm.textTags[title.endIndex].push(title);
             }
+            vm.isTagScreenOn = false;
         }
 
         vm.RemoveTag = function (tag) {
