@@ -31,7 +31,9 @@ angular.module('myApp.view3', ['ngRoute'])
         vm.updateSelectedText = updateSelectedText;
         vm.updateFilter = updateFilter;
         vm.tag = tag;
+        vm.removeTag = removeTag;
 
+        vm.selectedIndex = 0;
         vm.startOffset = -1;
         vm.endOffset = -1;
         vm.filter = "";
@@ -39,6 +41,7 @@ angular.module('myApp.view3', ['ngRoute'])
         vm.labelsDB = angular.toJson(vm.labelsDBjson);
         vm.activeTags = [];
         vm.textArray = [];
+        vm.textTags = [];
 
         activate();
 
@@ -85,7 +88,6 @@ angular.module('myApp.view3', ['ngRoute'])
 
             vm.loadLabelsDB();
             vm.loadText();
-            vm.taggedText = $sce.trustAsHtml(vm.text);
         }
 
         function isSelectionValid() {
@@ -111,6 +113,23 @@ angular.module('myApp.view3', ['ngRoute'])
 
         function loadText() {
             vm.textArray = vm.text.split('');
+            vm.templateUrl = 'popoverTemplate.html';
+            vm.textArray.forEach(function (char, index) {
+                vm.textTags[index] = [];
+                vm.textArray[index] =   '<span>' +
+                                            char +
+                                            '<sup ng-show="vm.textTags['+index+'].length > 0">' +
+                                                '<a ng-click="vm.selectedIndex='+index+'" uib-popover-template="vm.templateUrl" popover-trigger="click" popover-append-to-body="true" popover-placement="bottom">' +
+                                                    'i' +
+                                                '</a>' +
+                                            '</sup>' +
+                                        '</span>';
+            });
+            vm.taggedText = $sce.trustAsHtml(vm.textArray.join(''));
+        }
+
+        function removeTag(index) {
+            vm.textTags[vm.selectedIndex].splice(index,1);
         }
 
         function updateSelectedText() {
@@ -141,10 +160,14 @@ angular.module('myApp.view3', ['ngRoute'])
 
         function tag(titlesObj) {
             console.log(titlesObj);
-            if (vm.startOffset >= 0 && vm.endOffset >= 0) {
-                vm.textArray[vm.startOffset] = '<a uib-tooltip="' + titlesObj.titles[0].title + '">' + vm.textArray[vm.startOffset];
-                vm.textArray[vm.endOffset] = vm.textArray[vm.endOffset] + '</a>';
-                vm.taggedText = $sce.trustAsHtml(vm.textArray.join(''));
+            if (vm.startOffset >= 0 && vm.endOffset > 0) {
+                var title = {};
+                title.startIndex = vm.startOffset;
+                title.endIndex = vm.endOffset - 1;
+                title.title = titlesObj.titles[0].title;
+                title.text = vm.text.substring(vm.startOffset,vm.endOffset);
+                title.object = titlesObj;
+                vm.textTags[title.endIndex].push(title);
             }
         }
 
