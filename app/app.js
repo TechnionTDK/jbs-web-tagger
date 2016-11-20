@@ -5,6 +5,7 @@ angular.module('myApp', [
   'ngRoute',
   'ui.bootstrap',
   'myApp.view1',
+  'myApp.tagModal',
   'myApp.view2',
   'myApp.view3',
   'myApp.view4',

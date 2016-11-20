@@ -22,7 +22,7 @@ angular.module('myApp.view3', [])
             controllerAs: 'vm'
         });
     }])
-    .controller('View3Ctrl', function ($rootScope, $scope, $http, $sce) {
+    .controller('View3Ctrl', function ($rootScope, $scope, $http, $sce, $uibModal) {
         var vm = this;
 
         vm.loadLabelsDB = loadLabelsDB;
@@ -71,19 +71,19 @@ angular.module('myApp.view3', [])
                 // or server returns response with an error status.
             });
 
-            vm.text = "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה";
+            vm.text = "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא\n" +
+                "אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא אאא";
 
             vm.loadLabelsDB();
             vm.loadText();
@@ -96,6 +96,7 @@ angular.module('myApp.view3', [])
         function showTagScreen()
         {
             console.log("<show tag screen>");
+            // createTagModal();
             vm.isTagScreenOn = true;
         }
 
@@ -115,11 +116,11 @@ angular.module('myApp.view3', [])
             vm.templateUrl = 'popoverTemplate.html';
             vm.textArray.forEach(function (char, index) {
                 vm.textTags[index] = [];
-                vm.textArray[index] =   '<span>' +
+                vm.textArray[index] =   '<span id="text_'+index+'">' +
                                             char +
                                             '<sup ng-show="vm.textTags['+index+'].length > 0">' +
                                                 '<a ng-click="vm.selectedIndex='+index+'" uib-popover-template="vm.templateUrl" popover-trigger="\'outsideClick\'" popover-append-to-body="true" popover-placement="bottom">' +
-                                                    'i' +
+                                                    '*' +
                                                 '</a>' +
                                             '</sup>' +
                                         '</span>';
@@ -132,13 +133,18 @@ angular.module('myApp.view3', [])
         }
 
         function updateSelectedText() {
-            console.log("<updateSelectedText>");
-            // var flag = 0;
             var sel = window.getSelection();
-            vm.startOffset = sel.anchorOffset;
-            vm.endOffset = sel.extentOffset;
-            console.log("vm.startOffset = " + vm.startOffset);
-            console.log("vm.endOffset = " + vm.endOffset)
+            var a = sel.getRangeAt(0).startContainer.parentNode.id;
+            var b = sel.getRangeAt(0).endContainer.parentNode.id;
+
+            if (a.indexOf('text_') === 0 && b.indexOf('text_') === 0)
+            {
+                a = a.split("_")[1];
+                b = b.split("_")[1];
+                vm.startOffset = Number(a);
+                vm.endOffset = Number(b)+1;
+                console.log(a,b)
+            }
         }
 
         function updateFilter() {
@@ -174,5 +180,24 @@ angular.module('myApp.view3', [])
         vm.RemoveTag = function (tag) {
             console.log(vm.hoveredPart, tag);
         };
+
+        function createTagModal() {
+            var resolve = {
+                header: 'Tag Modal'
+            };
+            return createModal('/components/modals/tagModal/tagModal.html','tagModalCtrl as vm','wide',resolve,'static');
+        }
+
+        function createModal(templateUrl,controller,size,resolve,backdrop) {
+            var options = {};
+            options.templateUrl = templateUrl;
+            options.controller = controller;
+            options.size = size;
+            options.resolve = resolve;
+            if (backdrop) {
+                options.backdrop = backdrop;
+            }
+            return $uibModal.open(options);
+        }
     });
 

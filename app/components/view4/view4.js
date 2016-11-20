@@ -22,13 +22,12 @@ angular.module('myApp.view4', [])
             controllerAs: 'vm'
         });
     }])
-    .controller('View4Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $document) {
+    .controller('View4Ctrl', function ($rootScope, $scope, $http, $sce, $timeout) {
         var vm = this;
         vm.log = true;
         vm.loadLabelsDB = loadLabelsDB;
         vm.loadText = loadText;
         vm.updateSelectedText = updateSelectedText;
-        vm.updateSelectedText2 = updateSelectedText2;
         vm.updateFilter = updateFilter;
         vm.tag = tag;
         vm.removeTag = removeTag;
@@ -98,19 +97,15 @@ angular.module('myApp.view4', [])
         function isSelectionValid() {
         	if (vm.log) console.log("** isSelectionValid (begin) **");
             return vm.startOffset >= 0 && vm.endOffset >= 0;
-        	if (vm.log) console.log("** isSelectionValid (end) **");
         }
 
         function showTagScreen()
         {
         	if (vm.log) console.log("** showTagScreen (begin) **");
             vm.isTagScreenOn = true;
-            //var textbox = document.getElementById("tagNameInput");
             $timeout(function (){
             	$("#tagNameInput").focus();
             }, 200);
-            
-
             if (vm.log) console.log("** showTagScreen (end) **");
         }
 
@@ -136,13 +131,13 @@ angular.module('myApp.view4', [])
             vm.textArray.forEach(function (char, index) {
                 vm.textTags[index] = [];
                 vm.textArray[index] =   '<span>' +
-							                '<span id="text_'+index+'_tagged" ng-show="vm.textTags['+index+'].length > 0">' +
-							                '<a class="tagged-text" ng-click="vm.selectedIndex='+index+'" uib-popover-template="vm.templateUrl" popover-trigger="\'outsideClick\'" popover-append-to-body="true" popover-placement="bottom">' +
-							                char +
-							                '</a>' +
-							                '</span>' +
-							                '<span id="text_'+index+'_untagged" ng-hide="vm.textTags['+index+'].length > 0">' +
-							                char +
+							                '<span ng-show="vm.textTags['+index+'].length > 0">' +
+                                                '<a class="tagged-text" id="text_'+index+'_tagged" ng-click="vm.selectedIndex='+index+'" uib-popover-template="vm.templateUrl" popover-trigger="\'outsideClick\'" popover-append-to-body="true" popover-placement="bottom">' +
+                                                    char +
+                                                '</a>' +
+                                            '</span>' +
+                                            '<span id="text_'+index+'_untagged" ng-hide="vm.textTags['+index+'].length > 0">' +
+                                                char +
 							                '</span>' +
                                         '</span>';
             });
@@ -157,14 +152,6 @@ angular.module('myApp.view4', [])
         }
 
         function updateSelectedText() {
-        	if (vm.log) console.log("** updateSelectedText (begin) **");
-            // var flag = 0;
-            var sel = window.getSelection();
-            vm.startOffset = sel.anchorOffset;
-            vm.endOffset = sel.extentOffset;
-            if (vm.log) console.log("** updateSelectedText (end) **");
-        }
-        function updateSelectedText2() {
             var sel = window.getSelection();
             var a = sel.getRangeAt(0).startContainer.parentNode.id;
             var b = sel.getRangeAt(0).endContainer.parentNode.id;
@@ -176,9 +163,7 @@ angular.module('myApp.view4', [])
             	vm.startOffset = Number(a);
                 vm.endOffset = Number(b)+1;
                 console.log(a,b)
-            	
             }
-            
         }
 
         function updateFilter() {
@@ -211,7 +196,7 @@ angular.module('myApp.view4', [])
                 title.object = titlesObj;
                 for (var i = title.startIndex; i < vm.endOffset; i++)
                 {
-                	console.log(i)
+                	console.log(i);
                 	vm.textTags[i].push(title);
                 }
                 console.log('oren',vm.textTags);

@@ -1,12 +1,12 @@
 <div>
-    <div class="col-xs-6" style="text-align: center">
-        <h1>Tagged Text</h1>
-        <pre id="taggedText" dir="rtl" ng-bind-html="vm.taggedText" compile-template></pre>
+    <div class="col-xs-12" style="text-align: center">
+        <!--<h1>Tagged Text</h1>-->
+        <pre id="taggedText" dir="rtl" ng-mouseup="vm.updateSelectedText()" ng-bind-html="vm.taggedText" compile-template></pre>
     </div>
-    <div class="col-xs-6" style="text-align: center">
-        <h1>Original Text</h1>
-        <pre id="text" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind="vm.text"></pre>
-    </div>
+    <!--<div class="col-xs-6" style="text-align: center">-->
+        <!--<h1>Original Text</h1>-->
+        <!--<pre id="text" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind="vm.text"></pre>-->
+    <!--</div>-->
 </div>
 
 <!--  Tags screen -->
@@ -22,5 +22,13 @@
 </div>
 
 <script type="text/ng-template" id="popoverTemplate.html">
-    <div ng-repeat="tag in vm.textTags[vm.selectedIndex]">{{tag.title}} <a ng-click="vm.removeTag($index)">X</a></div>
+    <div style="text-align: right" class="panel panel-default" ng-repeat="tag in vm.textTags[vm.selectedIndex]">
+        <div class="panel-heading">
+            <p>{{tag.title}}&nbsp;&nbsp;&nbsp;&nbsp;<a ng-click="vm.removeTag($index)">הסר</a></p>
+        </div>
+        <div class="panel-body">
+            <p class="col-xs-12">טקסט מתויג: {{tag.text}}</p>
+            <p class="col-xs-12">החל מתו: {{tag.startIndex}} ועד תו: {{tag.endIndex}}</p>
+        </div>
+    </div>
 </script>
