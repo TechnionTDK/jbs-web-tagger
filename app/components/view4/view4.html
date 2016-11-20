@@ -1,0 +1,26 @@
+<div>
+    <div class="col-xs-6" style="text-align: center">
+        <h1>Tagged Text</h1>
+        <pre id="taggedText" ng-mouseup="vm.updateSelectedText2()" dir="rtl" ng-bind-html="vm.taggedText" compile-template></pre>
+    </div>
+    <div class="col-xs-6" style="text-align: center">
+        <h1>Original Text</h1>
+        <pre id="text" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind="vm.text"></pre>
+    </div>
+</div>
+
+<!--  Tags screen -->
+<div ng-show="vm.isTagScreenOn" class="text-center tags-div">
+    <label>
+        <input id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
+    </label>
+    <br>
+    <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" class="tag-selector"
+       ng-click="vm.tag(item)">
+        {{item.titles[0].title}}
+    </p>
+</div>
+
+<script type="text/ng-template" id="popoverTemplate.html">
+    <div ng-repeat="tag in vm.textTags[vm.selectedIndex]">{{tag.title}} <a ng-click="vm.removeTag($index)">X</a></div>
+</script>
