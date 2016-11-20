@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.view3', ['ngRoute'])
+angular.module('myApp.view3', [])
     .directive('compileTemplate', function ($compile,$parse) {
         return {
         link: function (scope, element, attr) {
@@ -22,8 +22,7 @@ angular.module('myApp.view3', ['ngRoute'])
             controllerAs: 'vm'
         });
     }])
-    .controller('View3Ctrl', ['$rootScope', '$scope', '$http', '$sce', '$document',
-    function ($rootScope, $scope, $http, $sce) {
+    .controller('View3Ctrl', function ($rootScope, $scope, $http, $sce) {
         var vm = this;
 
         vm.loadLabelsDB = loadLabelsDB;
@@ -175,5 +174,5 @@ angular.module('myApp.view3', ['ngRoute'])
         vm.RemoveTag = function (tag) {
             console.log(vm.hoveredPart, tag);
         };
-    }]);
+    });
 

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngRoute'])
+angular.module('myApp.view1', [])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/view1', {
@@ -10,7 +10,7 @@ angular.module('myApp.view1', ['ngRoute'])
         });
     }])
 
-    .controller('View1Ctrl', ['$rootScope', '$scope', '$http', '$document', function ($rootScope, $scope, $http, $document) {
+    .controller('View1Ctrl', function ($rootScope, $scope, $http, $document) {
 
         var vm = this;
 
@@ -390,4 +390,4 @@ angular.module('myApp.view1', ['ngRoute'])
                 console.log(text.$$hashKey, text.i, text.length);
             });
         };
-    }]);
+    });
