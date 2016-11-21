@@ -20,19 +20,19 @@
     </button>
 </div>
 
-<div ng-show="vm.texts.length === 0 && !vm.loading" class="text-center">
+<div ng-show="!vm.loading && vm.texts.length === 0" class="text-center">
         <br><br>
         <h1>Please load text</h1><br>
         <button type="button" class="btn btn-primary btn-sm"  ng-click="vm.openText()" style="font-size: 30px">
           <span class="glyphicon glyphicon-open"></span> Open text
         </button>
 </div>
-<div ng-show="vm.texts.length === 0 && vm.loading" class="text-center">
+<div ng-show="vm.loading" class="text-center">
         <br><br>
         <h1>Loading data, please wait</h1><br>
         <img src="images/throbber.gif">
 </div>
-<div ng-show="vm.texts.length > 0">
+<div ng-show="!vm.loading && vm.texts.length > 0">
     <div class="col-xs-12" style="text-align: center">
         <!--<h1>Tagged Text</h1>-->
         <table width="100%">
