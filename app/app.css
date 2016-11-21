@@ -101,3 +101,7 @@
 	color: blue;
 	cursor: pointer;
 }
+
+.highlighted-text {
+	background-color: #80ffff
+}

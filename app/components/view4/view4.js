@@ -11,9 +11,7 @@ angular.module('myApp.view4', [])
             }
             //Recompile if the template changes
             scope.$watch(getStringValue, function () {
-                $compile(element, null, -9999)(scope);  //The -9999 makes it skip directives so that we do not recompile ourselves
-                //vm.loading = false;
-                scope.loading = false;
+            	$compile(element, null, -9999)(scope);  //The -9999 makes it skip directives so that we do not recompile ourselves
                 
             });
         }
@@ -25,9 +23,8 @@ angular.module('myApp.view4', [])
             controllerAs: 'vm'
         });
     }])
-    .controller('View4Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal) {
+    .controller('View4Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window) {
         var vm = this;
-        $scope.loading = true;
         vm.log = true;
         vm.loadLabelsDB = loadLabelsDB;
         vm.loadText = loadText;
@@ -45,7 +42,7 @@ angular.module('myApp.view4', [])
         vm.activeTags = [];
         vm.textArray = [];
         vm.textTags = [];
-
+        vm.highlightedText = {};
         vm.currentSelectedFilter = -1;
         activate();
 
@@ -152,7 +149,6 @@ angular.module('myApp.view4', [])
         function closeTagScreen()
         {
         	if (vm.log) console.log("** closeTagScreen (begin) **");
-            console.log("<close tag screen>");
             vm.isTagScreenOn = false;
         	if (vm.log) console.log("** closeTagScreen (end) **");
         }
@@ -170,7 +166,9 @@ angular.module('myApp.view4', [])
             vm.templateUrl = 'popoverTemplate.html';
             vm.textArray.forEach(function (char, index) {
                 vm.textTags[index] = [];
-                vm.textArray[index] =   '<span>' +
+                
+                var cl = 'ng-class="(vm.highlightedText['+index+']) ? \'highlighted-text\' : \'\'"';
+                vm.textArray[index] =   '<span ' +  cl + '>' +  
 							                '<span ng-show="vm.textTags['+index+'].length > 0">' +
                                                 '<a class="tagged-text" id="text_'+index+'_tagged" ng-click="vm.selectedIndex='+index+'" uib-popover-template="vm.templateUrl" popover-trigger="\'outsideClick\'" popover-append-to-body="true" popover-placement="bottom">' +
                                                     char +
@@ -195,16 +193,47 @@ angular.module('myApp.view4', [])
 
         function updateSelectedText() {
             var sel = window.getSelection();
-            var a = sel.getRangeAt(0).startContainer.parentNode.id;
-            var b = sel.getRangeAt(0).endContainer.parentNode.id;
-            
-            if (a.indexOf('text_') === 0 && b.indexOf('text_') === 0)
+            if (sel)
             {
-            	a = a.split("_")[1];
-            	b = b.split("_")[1];
-            	vm.startOffset = Number(a);
-                vm.endOffset = Number(b)+1;
+            	var a = sel.getRangeAt(0).startContainer.parentNode.id;
+            	var b = sel.getRangeAt(0).endContainer.parentNode.id;
+            	
+            	if (a.indexOf('text_') === 0 && b.indexOf('text_') === 0)
+            	{
+            		a = a.split("_")[1];
+            		b = b.split("_")[1];
+            		vm.startOffset = Number(a);
+            		vm.endOffset = Number(b)+1;
+            	}
+            	{
+            		//fix to the left
+            		while (vm.text[vm.startOffset] === " ")
+            		{
+            			vm.startOffset++;
+            		}
+        			while (vm.text[vm.startOffset] !== " ")
+        			{
+        				vm.startOffset--;
+        			}
+        			vm.startOffset++;
+            		//fix to the right
+            		while (vm.text[vm.endOffset] === " ")
+            		{
+            			vm.endOffset--;
+            		}
+        			while (vm.text[vm.endOffset] !== " ")
+        			{
+        				vm.endOffset++;
+        			}
+        			
+        			vm.highlightedText = {};
+        			for (var i = vm.startOffset; i < vm.endOffset; i++)
+        			{
+        				vm.highlightedText[i] = true;
+        			}
+            	}
             }
+            $window.getSelection().removeAllRanges();
         }
 
         function updateFilter() {
@@ -234,7 +263,6 @@ angular.module('myApp.view4', [])
             		vm.currentSelectedFilter = vm.lim;
             	}
             }
-            console.log(vm.lim, vm.currentSelectedFilter)
             
             for (var i = 0; i<= vm.lim; i++) {
             	vm.labelsDBjsonFiltered.subjects[i].selected = (vm.currentSelectedFilter === i);
@@ -255,7 +283,6 @@ angular.module('myApp.view4', [])
                 title.object = titlesObj;
                 for (var i = title.startIndex; i < vm.endOffset; i++)
                 {
-                	console.log(i);
                 	vm.textTags[i].push(title);
                 }
             }
@@ -265,7 +292,6 @@ angular.module('myApp.view4', [])
 
         vm.RemoveTag = function (tag) {
         	if (vm.log) console.log("** RemoveTag (begin) **");
-            console.log(vm.hoveredPart, tag);
         	if (vm.log) console.log("** RemoveTag (end) **");
         };
         
