@@ -1,4 +1,28 @@
-<div>
+<!--  Buttons for the header -->
+
+<div style="position: absolute; top: 0; right:0; padding: 10px">
+        <button type="button" class="btn btn-primary btn-sm"  ng-click="vm.openText()">
+          <span class="glyphicon glyphicon-open"></span> Open text
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" ng-click="vm.saveText()">
+          <span class="glyphicon glyphicon-save"></span> Save text
+        </button>
+
+    
+</div>
+
+<!--  the text loading frame -->
+<div ng-if="vm.stateLoadingText" align="center">
+    <textarea style="width: 100%" rows="30"></textarea>
+    <button type="button" class="btn btn-success btn-sm"  ng-click="vm.loadNewText()" width="150px">
+      <span class="glyphicon glyphicon-ok"></span> Load
+    </button>
+    <button type="button" class="btn btn-danger btn-sm"  ng-click="vm.cancelNewText()" width="150px">
+      <span class="glyphicon glyphicon-ok"></span> Cancel
+    </button>
+</div>
+
+<div ng-if="vm.stateWorking">
     <div class="col-xs-12" style="text-align: center">
         <!--<h1>Tagged Text</h1>-->
         <table width="100%">

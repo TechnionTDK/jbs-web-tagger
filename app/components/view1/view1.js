@@ -33,6 +33,10 @@ angular.module('myApp.view1', [])
         vm.removeTag = removeTag;
         vm.loadNextText = loadNextText;
         vm.loadPrevText = loadPrevText;
+        vm.openText = openText;
+        vm.saveText = saveText;
+        vm.cancelOpenText = cancelOpenText;
+        vm.approveOpenText = approveOpenText;
 
         vm.selectedIndex = 0;
         vm.startOffset = -1;
@@ -47,6 +51,8 @@ angular.module('myApp.view1', [])
         vm.highlightedText = {};
         vm.currentSelectedFilter = -1;
         vm.textNumber = 0;
+        vm.stateWorking = true;
+        vm.stateLoadingText = false;
 
         activate();
 
@@ -75,19 +81,30 @@ angular.module('myApp.view1', [])
         	if (vm.log) console.log("** activate (end) **");
         }
 
+        function clearSelection() {
+            vm.startOffset = -1;
+            vm.endOffset = -1;
+            vm.highlightedText = []
+        }
         function loadPrevText() {
+            clearSelection();
             if (vm.textNumber > 0) {
+                unloadSingleText();
                 --vm.textNumber;
+            
                 loadSingleText();
             }
         }
 
         function loadNextText() {
+            clearSelection();
             if (vm.textNumber < vm.texts.length) {
+                unloadSingleText();
                 ++vm.textNumber;
                 loadSingleText();
             }
         }
+
 
         function createDownAction() {
             $rootScope.down = function (e) {
@@ -116,11 +133,13 @@ angular.module('myApp.view1', [])
                         vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;
                     }
                 }
-                else if (e.keyCode === 13 && vm.isTagScreenOn) //up
+                else if (e.keyCode === 13 && vm.isTagScreenOn) //enter
                 {
                     if (vm.lim >= 0) {
+
                         vm.tag(vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter]);
                         closeTagScreen();
+                        clearSelection();
                     }
                 }
             };
@@ -179,12 +198,46 @@ angular.module('myApp.view1', [])
         	if (vm.log) console.log("** closeTagScreen (end) **");
         }
 
+        function unloadSingleText() {
+            var titles = {};
+            vm.texts[vm.textNumber].tagsInternal = [];
+            for (var i in vm.textTags)
+            {
+                for (var t = 0; t < vm.textTags[i].length; t++)
+                {
+                    var tag = vm.textTags[i][t];
+                    if (!titles[tag.id])
+                    {
+                        titles[tag.id] = true;
+                        vm.texts[vm.textNumber].tagsInternal.push(tag);
+                    }
+                }
+            }
+        }
+
         function loadSingleText() {
             vm.text = vm.texts[vm.textNumber].text;
+            var tags = {};
+
+            if (vm.texts[vm.textNumber].tagsInternal)
+            {
+                for (var i in vm.texts[vm.textNumber].tagsInternal)
+                {
+                    var tag = vm.texts[vm.textNumber].tagsInternal[i];
+                    var startIndex = tag.startIndex;
+                    var endIndex = tag.endIndex;
+
+                    for (var j = startIndex; j <= endIndex; j++)
+                    {
+                        if (!tags[j]) tags[j] = [];
+                        tags[j].push(tag);
+                    }
+                }
+            }
             vm.textArray = vm.text.split('');
             vm.templateUrl = 'popoverTemplate.html';
             vm.textArray.forEach(function (char, index) {
-                vm.textTags[index] = [];
+                vm.textTags[index] = tags[index] || [];
 
                 var cl = 'ng-class="(vm.highlightedText[' + index + ']) ? \'highlighted-text\' : \'\'"';
                 vm.textArray[index] = '<span ' + cl + '>' +
@@ -209,6 +262,11 @@ angular.module('myApp.view1', [])
                 url: 'http://localhost:8000/example/seferhamitzvot.json'
             }).then(function (response) {
                 vm.texts = response.data.subjects;
+                for (var i in vm.texts)
+                {
+                    vm.texts[i].tagsInternal = [];
+                }
+                clearSelection();
                 loadSingleText();
             });
             if (vm.log) console.log("** loadText (end) **");
@@ -328,6 +386,7 @@ angular.module('myApp.view1', [])
             
             if (vm.startOffset >= 0 && vm.endOffset > 0) {
                 var title = {};
+                title.id = titlesObj.$$hashKey + "_" + vm.startOffset + "_" + (vm.endOffset -1);
                 title.startIndex = vm.startOffset;
                 title.endIndex = vm.endOffset - 1;
                 title.title = titlesObj.titles[0].title;
@@ -358,6 +417,67 @@ angular.module('myApp.view1', [])
                 options.backdrop = backdrop;
             }
             return $uibModal.open(options);
+        }
+        
+        function openText() {
+            vm.stateWorking = false;
+            vm.stateLoadingText = true;
+        }
+
+        function saveText() {
+            console.log("saveText");
+            unloadSingleText();
+
+            var res = [];
+
+
+            for (var i in vm.texts)
+            {
+                var resObj = {};
+                
+                resObj.text = vm.texts[i].text;
+                resObj.title = vm.texts[i].title;
+                resObj.type = vm.texts[i].type;
+                resObj.uri = vm.texts[i].uri;
+                resObj.tags = [];
+                for (var j in vm.texts[i].tagsInternal)
+                {
+                    var tag = {};
+                    tag.span = [vm.texts[i].tagsInternal[j].startIndex, vm.texts[i].tagsInternal[j].endIndex];
+                    tag.uri = vm.texts[i].tagsInternal[j].object.uri;
+                    resObj.tags.push(tag);
+                }
+                res.push(resObj);
+            }
+            
+            var data = JSON.stringify(res, undefined, 2);
+            var blob = new Blob([data], {type: 'text/json'});
+            var filename = "oren.json";
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+              window.navigator.msSaveOrOpenBlob(blob, filename);
+            }
+            else{
+              var e = document.createEvent('MouseEvents'),
+                  a = document.createElement('a');
+
+              a.download = filename;
+              a.href = window.URL.createObjectURL(blob);
+              a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+              e.initEvent('click', true, false, window,
+                  0, 0, 0, 0, 0, false, false, false, false, 0, null);
+              a.dispatchEvent(e);
+            }
+
+            
+
+        }
+        function cancelOpenText() {
+            vm.stateWorking = true;
+            vm.stateLoadingText = false;    
+        }
+        function approveOpenText() {
+            vm.stateWorking = true;
+            vm.stateLoadingText = false;    
         }
 
     });
