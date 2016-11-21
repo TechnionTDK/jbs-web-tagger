@@ -1,70 +1,45 @@
-
-
-<!--  Text screen -->
-
-
 <div>
-
-
-    <div class="labels-db-loader" ng-if="vm.state === 0">
-        <label>
-            <textarea>{{vm.labelsDB}}</textarea>
-        </label><br>
-        <input type="button" ng-click="vm.loadLabelsDB()" value="Load labels database">
-    </div>
-    <div class="labels-db-loader" ng-if="vm.state === 1">
-        <label>
-            <textarea>{{vm.text}}</textarea>
-        </label><br>
-        <input type="button" ng-click="vm.loadText()" value="Load Text to be tagged">
-    </div>
-
-
-
-
-
-
-    <div class="labels-db-loader" ng-if="vm.state === 2">
+    <div class="col-xs-12" style="text-align: center">
+        <!--<h1>Tagged Text</h1>-->
         <table width="100%">
-            <tr>
-                <td width="40%" valign="top">
-                     <pre id="text" ng-mouseup="vm.updateSelectedText()" dir="rtl"><span id="{{text.id}}" ng-repeat="text in vm.taggedText" ng-class="(text.tags.length > 0) ? 'tagged' : ''" ng-mouseenter="vm.showTagsDiv($event, text)" ng-mouseleave="vm.hideTagsDiv($event,text)" ng-click="vm.freezeDiv = true">{{text.text}}</span></pre>
-               </td>
-            </tr>
-
+        	<tr>
+        		<td width="20%" valign="top">
+					<div ng-show="vm.isTagScreenOn" class="text-center tags-div">
+					    <label>
+					        <input id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
+					    </label>
+					    <br>
+					    <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" ng-class="(item.selected) ? 'tag-selector-selected ' : 'tag-selector'"
+					       ng-click="vm.tag(item)">
+					        {{item.titles[0].title}}
+					    </p>
+					</div>
+				</td>
+        		<td width="70%" valign="top">
+        			<pre id="taggedText" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind-html="vm.taggedText" compile-template style="font-size: 16px"></pre>
+        		</td>
+        		<td width="10%" valign="top">
+        			<p><span class="glyphicon glyphicon-triangle-top" style="font-size: 80px; cursor: pointer;"></span></p>
+        			<p style="font-size: 45px">1</p>
+        			<p style="font-size: 12px">title of text</p>
+        			<p><span class="glyphicon glyphicon-triangle-bottom" style="font-size: 80px; cursor: pointer;"></span></p>
+        		</td>
+        	</tr>
         </table>
+        
     </div>
-
-    <div class="text-left" id="tagsDiv" style="background-color: #aa9999; color:white; padding: 10px; border-radius: 15px;visibility: hidden; position: absolute; width: 350px; height:150px; border: 1px solid; top:0; left:0">
-        <table>
-            <tr ng-repeat="tag in vm.hoveredPart.tags">
-                <td>
-                    <span class="remove-tag-button" ng-click="vm.RemoveTag(tag)">x</span>
-                </td>
-                <td>
-                    {{tag.titles[0].title}}
-                </td>
-            </tr>
-        </table>
-        <div  dir="rtl">
-
-
-        </div>
-    </div>
-    
 </div>
-
-
 
 <!--  Tags screen -->
-<div ng-if="vm.isTagScreenOn" class="text-center tags-div">
-    <label>
-        <input type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
-    </label>
-    <br>
-    <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" class="tag-selector"
-       ng-click="vm.tag(item)">
-        {{item.titles[0].title}}
-    </p>
-</div>
 
+<script type="text/ng-template" id="popoverTemplate.html">
+    <div style="text-align: right" class="panel panel-default" ng-repeat="tag in vm.textTags[vm.selectedIndex]">
+        <div class="panel-heading">
+            <p style="cursur: pointer">{{tag.title}}&nbsp;&nbsp;&nbsp;&nbsp;<a ng-click="vm.removeTag($index)">הסר</a></p>
+        </div>
+        <div class="panel-body">
+            <p class="col-xs-12">טקסט מתויג: {{tag.text}}</p>
+            <p class="col-xs-12">החל מתו: {{tag.startIndex}} ועד תו: {{tag.endIndex}}</p>
+        </div>
+    </div>
+</script>
