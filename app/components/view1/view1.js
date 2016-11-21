@@ -50,70 +50,8 @@ angular.module('myApp.view1', [])
 
         function activate() {
         	if (vm.log) console.log("** activate (begin) **");
-            $rootScope.down = function(e)
-            {
-                if (e.keyCode === 84 && isSelectionValid() && !vm.isTagScreenOn)
-                {
-                    showTagScreen();
-                    vm.currentSelectedFilter = -1;
-                }
-                else if (e.keyCode === 27 && isSelectionValid() && vm.isTagScreenOn)
-                {
-                    closeTagScreen();
-                }
-                else if (e.keyCode === 40 && isSelectionValid() && vm.isTagScreenOn) //down
-                {
-                	if (vm.lim >= 0)
-                	{
-                		vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = false;
-                		vm.currentSelectedFilter = vm.currentSelectedFilter + 1;
-                		if (vm.currentSelectedFilter > vm.lim) vm.currentSelectedFilter = 0;
-                		vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;
-                	}
-                }
-                else if (e.keyCode === 38 && vm.isTagScreenOn) //up
-                {
-                	if (vm.lim >= 0)
-                	{
-                		vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = false;
-                		vm.currentSelectedFilter = vm.currentSelectedFilter - 1;
-                		if (vm.currentSelectedFilter < 0) vm.currentSelectedFilter = vm.lim;
-                		vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;                    
-                	}
-                }
-                else if (e.keyCode === 13 && vm.isTagScreenOn) //up
-                {
-                	if (vm.lim >= 0) {
-                		vm.tag(vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter]);
-                		closeTagScreen();                    
-                	}
-                }
-            	
-                
-            };
-
-            $http({
-                method: 'GET',
-                url: 'http://localhost:8000/data/'
-            }).then(function (response) {
-                vm.files = response.data;
-                vm.files.replace(/>/g,' ').replace(/</g,' ').split(' ').forEach(function (file) {
-                    if (file.endsWith('.json')) {
-                        $http({
-                            method: 'GET',
-                            url: 'http://localhost:8000/data/' + file
-                        }).then(function (content) {
-                            vm.labelsDBjson.subjects = vm.labelsDBjson.subjects.concat(content.data.subjects);
-                        }, errorCallback);
-                    }
-                });
-            }, errorCallback);
-
-            function errorCallback() {
-                if (vm.log) console.log("** activate - get data - " + angular.toJson(response));
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-            }
+            createDownAction();
+            loadLabels();
 
             vm.text = "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
                 "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
@@ -130,8 +68,69 @@ angular.module('myApp.view1', [])
                 "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה";
 
             vm.loadText();
-            
         	if (vm.log) console.log("** activate (end) **");
+        }
+
+        function createDownAction() {
+            $rootScope.down = function (e) {
+                if (e.keyCode === 84 && isSelectionValid() && !vm.isTagScreenOn) {
+                    showTagScreen();
+                    vm.currentSelectedFilter = -1;
+                }
+                else if (e.keyCode === 27 && isSelectionValid() && vm.isTagScreenOn) {
+                    closeTagScreen();
+                }
+                else if (e.keyCode === 40 && isSelectionValid() && vm.isTagScreenOn) //down
+                {
+                    if (vm.lim >= 0) {
+                        vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = false;
+                        vm.currentSelectedFilter = vm.currentSelectedFilter + 1;
+                        if (vm.currentSelectedFilter > vm.lim) vm.currentSelectedFilter = 0;
+                        vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;
+                    }
+                }
+                else if (e.keyCode === 38 && vm.isTagScreenOn) //up
+                {
+                    if (vm.lim >= 0) {
+                        vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = false;
+                        vm.currentSelectedFilter = vm.currentSelectedFilter - 1;
+                        if (vm.currentSelectedFilter < 0) vm.currentSelectedFilter = vm.lim;
+                        vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;
+                    }
+                }
+                else if (e.keyCode === 13 && vm.isTagScreenOn) //up
+                {
+                    if (vm.lim >= 0) {
+                        vm.tag(vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter]);
+                        closeTagScreen();
+                    }
+                }
+            };
+        }
+
+        function loadLabels() {
+            $http({
+                method: 'GET',
+                url: 'http://localhost:8000/data/'
+            }).then(function (response) {
+                vm.files = response.data;
+                vm.files.replace(/>/g, ' ').replace(/</g, ' ').split(' ').forEach(function (file) {
+                    if (file.endsWith('.json')) {
+                        $http({
+                            method: 'GET',
+                            url: 'http://localhost:8000/data/' + file
+                        }).then(function (content) {
+                            vm.labelsDBjson.subjects = vm.labelsDBjson.subjects.concat(content.data.subjects);
+                        }, errorCallback);
+                    }
+                });
+            }, errorCallback);
+
+            function errorCallback(response) {
+                if (vm.log) console.log("** activate - get data - " + angular.toJson(response));
+                // called asynchronously if an error occurs
+                // or server returns response with an error status.
+            }
         }
 
         function isSelectionValid() {
@@ -196,6 +195,27 @@ angular.module('myApp.view1', [])
 
         function updateSelectedText() {
             var sel = window.getSelection();
+
+            function isWhiteSpace(index) {
+                return vm.text[index] === " " || vm.text[index] === "\n";
+            }
+
+            function checkLeadingSpaces() {
+                return vm.startOffset < vm.maxIndex && isWhiteSpace(vm.startOffset);
+            }
+
+            function checkForStart() {
+                return vm.startOffset >= 0 && !isWhiteSpace(vm.startOffset);
+            }
+
+            function checkEndingSpaces() {
+                return vm.endOffset && isWhiteSpace(vm.endOffset);
+            }
+
+            function checkForEnd() {
+                return vm.endOffset <= vm.maxIndex && !isWhiteSpace(vm.endOffset);
+            }
+
             if (sel)
             {
             	var a = sel.getRangeAt(0).startContainer.parentNode.id;
@@ -206,24 +226,24 @@ angular.module('myApp.view1', [])
             		a = a.split("_")[1];
             		b = b.split("_")[1];
             		vm.startOffset = Number(a);
-            		vm.endOffset = Number(b)+1;
+            		vm.endOffset = Number(b);
 
             		//fix to the left
-            		while (vm.startOffset < vm.maxIndex && (vm.text[vm.startOffset] === " " || vm.text[vm.startOffset] === "\n"))
+            		while (checkLeadingSpaces())
             		{
             			vm.startOffset++;
             		}
-        			while (vm.startOffset >= 0 && vm.text[vm.startOffset] !== " " && vm.text[vm.startOffset] !== "\n")
+        			while (checkForStart())
         			{
         				vm.startOffset--;
         			}
         			vm.startOffset++;
             		//fix to the right
-            		while (vm.endOffset && (vm.text[vm.endOffset] === " " || vm.text[vm.endOffset] === "\n"))
+            		while (checkEndingSpaces())
             		{
             			vm.endOffset--;
             		}
-        			while (vm.endOffset <= vm.maxIndex && vm.text[vm.endOffset] !== " " && vm.text[vm.endOffset] !== "\n")
+        			while (checkForEnd())
         			{
         				vm.endOffset++;
         			}
