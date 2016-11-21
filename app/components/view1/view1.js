@@ -1,21 +1,6 @@
 'use strict';
 
 angular.module('myApp.view1', [])
-    .directive('compileTemplate', function ($compile,$parse) {
-        return {
-        link: function (scope, element, attr) {
-            var parsed = $parse(attr.ngBindHtml);
-
-            function getStringValue() {
-                return (parsed(scope) || '').toString();
-            }
-            //Recompile if the template changes
-            scope.$watch(getStringValue, function () {
-            	$compile(element, null, -9999)(scope);  //The -9999 makes it skip directives so that we do not recompile ourselves
-                
-            });
-        }
-    }})
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/view1', {
             templateUrl: 'components/view1/view1.html',
@@ -24,13 +9,8 @@ angular.module('myApp.view1', [])
         });
     }])
     .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window) {
-        $scope.showContent = function($fileContent){
-            $scope.content = $fileContent;
-        };
-
         var vm = this;
-        vm.log = true;
-        vm.loadText = loadText;
+
         vm.updateSelectedText = updateSelectedText;
         vm.updateFilter = updateFilter;
         vm.tag = tag;
@@ -39,8 +19,10 @@ angular.module('myApp.view1', [])
         vm.loadPrevText = loadPrevText;
         vm.openText = openText;
         vm.saveText = saveText;
-        vm.cancelOpenText = cancelOpenText;
-        vm.approveOpenText = approveOpenText;
+        vm.isSelectionValid = isSelectionValid;
+        vm.showContent = showContent;
+
+        vm.log = true;
         vm.loading = false;
         vm.selectedIndex = 0;
         vm.startOffset = -1;
@@ -66,11 +48,13 @@ angular.module('myApp.view1', [])
         	if (vm.log) console.log("** activate (begin) **");
             createDownAction();
             loadLabels();
-
-            vm.loadText();
+            loadText();
         	if (vm.log) console.log("** activate (end) **");
         }
 
+        function showContent(fileContent){
+            vm.content = fileContent;
+        }
         function clearSelection() {
             vm.startOffset = -1;
             vm.endOffset = -1;
@@ -81,7 +65,6 @@ angular.module('myApp.view1', [])
             if (vm.textNumber > 0) {
                 unloadSingleText();
                 --vm.textNumber;
-            
                 loadSingleText();
             }
         }
@@ -98,14 +81,7 @@ angular.module('myApp.view1', [])
 
         function createDownAction() {
             $rootScope.down = function (e) {
-                if (e.keyCode === 84 && isSelectionValid() && !vm.isTagScreenOn) {
-                    showTagScreen();
-                    vm.currentSelectedFilter = -1;
-                }
-                else if (e.keyCode === 27 && isSelectionValid() && vm.isTagScreenOn) {
-                    closeTagScreen();
-                }
-                else if (e.keyCode === 40 && isSelectionValid() && vm.isTagScreenOn) //down
+                if (e.keyCode === 40 && isSelectionValid()) //down
                 {
                     if (vm.lim >= 0) {
                         vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = false;
@@ -114,7 +90,7 @@ angular.module('myApp.view1', [])
                         vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;
                     }
                 }
-                else if (e.keyCode === 38 && vm.isTagScreenOn) //up
+                else if (e.keyCode === 38) //up
                 {
                     if (vm.lim >= 0) {
                         vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = false;
@@ -123,12 +99,11 @@ angular.module('myApp.view1', [])
                         vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;
                     }
                 }
-                else if (e.keyCode === 13 && vm.isTagScreenOn) //enter
+                else if (e.keyCode === 13) //enter
                 {
                     if (vm.lim >= 0) {
 
                         vm.tag(vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter]);
-                        closeTagScreen();
                         clearSelection();
                     }
                 }
@@ -163,29 +138,6 @@ angular.module('myApp.view1', [])
         function isSelectionValid() {
         	if (vm.log) console.log("** isSelectionValid (begin) **");
             return vm.startOffset >= 0 && vm.endOffset >= 0;
-        }
-
-        function showTagScreen()
-        {
-        	if (vm.log) console.log("** showTagScreen (begin) **");
-        	vm.isTagScreenOn = true;
-            $timeout(function (){
-            	var el = document.getElementById('tagNameInput');
-            	el.value = "";
-            	vm.filter = "";
-            	vm.updateFilter();
-            	vm.limit = -1;
-            	$("#tagNameInput").focus();
-            	
-            	}, 50);
-            if (vm.log) console.log("** showTagScreen (end) **");
-        }
-
-        function closeTagScreen()
-        {
-        	if (vm.log) console.log("** closeTagScreen (begin) **");
-            vm.isTagScreenOn = false;
-        	if (vm.log) console.log("** closeTagScreen (end) **");
         }
 
         function unloadSingleText() {
@@ -255,10 +207,9 @@ angular.module('myApp.view1', [])
                 var data = JSON.parse(content);
                 vm.texts = data.subjects;
 
-                for (var i in vm.texts)
-                {
-                    vm.texts[i].tagsInternal = [];
-                }
+                vm.texts.forEach(function (text) {
+                    text.tagsInternal = [];
+                });
                 clearSelection();
                 loadSingleText();
                 
@@ -371,13 +322,11 @@ angular.module('myApp.view1', [])
             for (var i = 0; i<= vm.lim; i++) {
             	vm.labelsDBjsonFiltered.subjects[i].selected = (vm.currentSelectedFilter === i);
             }
-            
         	if (vm.log) console.log("** updateFilter (end) **");
         }
 
         function tag(titlesObj) {
         	if (vm.log) console.log("** tag (begin) **");
-            
             if (vm.startOffset >= 0 && vm.endOffset > 0) {
                 var title = {};
                 title.id = titlesObj.$$hashKey + "_" + vm.startOffset + "_" + (vm.endOffset -1);
@@ -391,26 +340,7 @@ angular.module('myApp.view1', [])
                 	vm.textTags[i].push(title);
                 }
             }
-            vm.isTagScreenOn = false;
         	if (vm.log) console.log("** tag (end) **");
-        }
-        
-        function createTagModal() {
-            var resolve = {
-                header: 'Tag Modal'
-            };
-            return createModal('/components/modals/tagModal/tagModal.html','tagModalCtrl as vm','wide',resolve,'static');
-        }
-        function createModal(templateUrl,controller,size,resolve,backdrop) {
-            var options = {};
-            options.templateUrl = templateUrl;
-            options.controller = controller;
-            options.size = size;
-            options.resolve = resolve;
-            if (backdrop) {
-                options.backdrop = backdrop;
-            }
-            return $uibModal.open(options);
         }
         
         function openText() {
@@ -418,11 +348,10 @@ angular.module('myApp.view1', [])
             $("#fileReaderButton").on('change',function(){
                  vm.loading = true;
                  $timeout(function() {
-                    vm.loadText($scope.content);
+                    loadText(vm.content);
                  }, 1000);
             });
             el.click();
-            
         }
 
         function saveText() {
@@ -430,26 +359,22 @@ angular.module('myApp.view1', [])
             unloadSingleText();
 
             var res = [];
-
-
-            for (var i in vm.texts)
-            {
+            vm.texts.forEach(function (text) {
                 var resObj = {};
-                
-                resObj.text = vm.texts[i].text;
-                resObj.title = vm.texts[i].title;
-                resObj.type = vm.texts[i].type;
-                resObj.uri = vm.texts[i].uri;
+                resObj.text = text.text;
+                resObj.title = text.title;
+                resObj.type = text.type;
+                resObj.uri = text.uri;
                 resObj.tags = [];
-                for (var j in vm.texts[i].tagsInternal)
-                {
+
+                text.tagsInternal.forEach(function (tagInternal) {
                     var tag = {};
-                    tag.span = [vm.texts[i].tagsInternal[j].startIndex, vm.texts[i].tagsInternal[j].endIndex];
-                    tag.uri = vm.texts[i].tagsInternal[j].object.uri;
+                    tag.span = [tagInternal.startIndex, tagInternal.endIndex];
+                    tag.uri = tagInternal.object.uri;
                     resObj.tags.push(tag);
-                }
+                });
                 res.push(resObj);
-            }
+            });
             
             var data = JSON.stringify({subjects:res}, undefined, 2);
             var blob = new Blob([data], {type: 'text/json'});
@@ -468,44 +393,6 @@ angular.module('myApp.view1', [])
                   0, 0, 0, 0, 0, false, false, false, false, 0, null);
               a.dispatchEvent(e);
             }
-
-            
-
         }
-        function cancelOpenText() {
-            vm.stateWorking = true;
-            vm.stateLoadingText = false;    
-        }
-        function approveOpenText() {
-            vm.stateWorking = true;
-            vm.stateLoadingText = false;    
-        }
-
-    }).directive('onReadFile', function ($parse) {
-    return {
-        restrict: 'A',
-        scope: false,
-        link: function(scope, element, attrs) {
-            var fn = $parse(attrs.onReadFile);
-            
-            element.on('change', function(onChangeEvent) {
-                var reader = new FileReader();
-                
-                reader.onload = function(onLoadEvent) {
-                    scope.$apply(function() {
-                        fn(scope, {$fileContent:onLoadEvent.target.result});
-                    });
-                };
-                try
-                {
-                    reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
-                }
-                catch(err)
-                {
-                    
-                }
-            });
-        }
-    };
-});
+    });
 
