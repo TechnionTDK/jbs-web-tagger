@@ -31,6 +31,8 @@ angular.module('myApp.view1', [])
         vm.updateFilter = updateFilter;
         vm.tag = tag;
         vm.removeTag = removeTag;
+        vm.loadNextText = loadNextText;
+        vm.loadPrevText = loadPrevText;
 
         vm.selectedIndex = 0;
         vm.startOffset = -1;
@@ -44,6 +46,8 @@ angular.module('myApp.view1', [])
         vm.textTags = [];
         vm.highlightedText = {};
         vm.currentSelectedFilter = -1;
+        vm.textNumber = 0;
+
         activate();
 
         //////////////////////////////////////////
@@ -69,6 +73,20 @@ angular.module('myApp.view1', [])
 
             vm.loadText();
         	if (vm.log) console.log("** activate (end) **");
+        }
+
+        function loadPrevText() {
+            if (vm.textNumber > 0) {
+                --vm.textNumber;
+                loadSingleText();
+            }
+        }
+
+        function loadNextText() {
+            if (vm.textNumber < vm.texts.length) {
+                ++vm.textNumber;
+                loadSingleText();
+            }
         }
 
         function createDownAction() {
@@ -161,29 +179,38 @@ angular.module('myApp.view1', [])
         	if (vm.log) console.log("** closeTagScreen (end) **");
         }
 
-        function loadText() {
-        	if (vm.log) console.log("** loadText (begin) **");
+        function loadSingleText() {
+            vm.text = vm.texts[vm.textNumber].text;
             vm.textArray = vm.text.split('');
             vm.templateUrl = 'popoverTemplate.html';
             vm.textArray.forEach(function (char, index) {
                 vm.textTags[index] = [];
 
-                var cl = 'ng-class="(vm.highlightedText['+index+']) ? \'highlighted-text\' : \'\'"';
-                vm.textArray[index] =   '<span ' +  cl + '>' +
-                                            '<span ng-show="vm.textTags['+index+'].length > 0">' +
-                                                '<a class="tagged-text" id="text_'+index+'_tagged" ng-click="vm.selectedIndex='+index+'" uib-popover-template="vm.templateUrl" popover-trigger="\'outsideClick\'" popover-append-to-body="true" popover-placement="bottom">' +
-                                                    char +
-                                                '</a>' +
-                                            '</span>' +
-                                            '<span id="text_'+index+'_untagged" ng-hide="vm.textTags['+index+'].length > 0">' +
-                                                char +
-                                            '</span>' +
-                                        '</span>';
+                var cl = 'ng-class="(vm.highlightedText[' + index + ']) ? \'highlighted-text\' : \'\'"';
+                vm.textArray[index] = '<span ' + cl + '>' +
+                    '<span ng-show="vm.textTags[' + index + '].length > 0">' +
+                    '<a class="tagged-text" id="text_' + index + '_tagged" ng-click="vm.selectedIndex=' + index + '" uib-popover-template="vm.templateUrl" popover-trigger="\'outsideClick\'" popover-append-to-body="true" popover-placement="bottom">' +
+                    char +
+                    '</a>' +
+                    '</span>' +
+                    '<span id="text_' + index + '_untagged" ng-hide="vm.textTags[' + index + '].length > 0">' +
+                    char +
+                    '</span>' +
+                    '</span>';
                 vm.maxIndex = index;
             });
-
-            
             vm.taggedText = $sce.trustAsHtml(vm.textArray.join(''));
+        }
+
+        function loadText() {
+            if (vm.log) console.log("** loadText (begin) **");
+            $http({
+                method: 'GET',
+                url: 'http://localhost:8000/example/seferhamitzvot.json'
+            }).then(function (response) {
+                vm.texts = response.data.subjects;
+                loadSingleText();
+            });
             if (vm.log) console.log("** loadText (end) **");
         }
 

@@ -16,13 +16,13 @@
 					</div>
 				</td>
         		<td width="70%" valign="top">
-        			<pre id="taggedText" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind-html="vm.taggedText" compile-template style="font-size: 16px"></pre>
+        			<pre id="taggedText" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind-html="vm.taggedText" compile-template style="font-size: 16px; white-space: pre-wrap; overflow: visible"></pre>
         		</td>
         		<td width="10%" valign="top">
-        			<p><span class="glyphicon glyphicon-triangle-top" style="font-size: 80px; cursor: pointer;"></span></p>
-        			<p style="font-size: 45px">1</p>
-        			<p style="font-size: 12px">title of text</p>
-        			<p><span class="glyphicon glyphicon-triangle-bottom" style="font-size: 80px; cursor: pointer;"></span></p>
+        			<span ng-click="vm.loadNextText()" class="glyphicon glyphicon-triangle-top" style="font-size: 80px; cursor: pointer;"></span>
+        			<p style="font-size: 45px">{{vm.textNumber + 1}}</p>
+        			<p style="font-size: 12px">{{vm.texts[vm.textNumber].title}}</p>
+        			<span ng-click="vm.loadPrevText()" class="glyphicon glyphicon-triangle-bottom" style="font-size: 80px; cursor: pointer;"></span>
         		</td>
         	</tr>
         </table>
