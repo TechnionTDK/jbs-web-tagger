@@ -189,7 +189,10 @@ angular.module('myApp.view1', [])
 
         function removeTag(index) {
         	if (vm.log) console.log("** removeTag (begin) **");
-            vm.textTags[vm.selectedIndex].splice(index,1);
+            var tag = vm.textTags[vm.selectedIndex][index];
+            for (var i = tag.startIndex; i <= tag.endIndex; ++i) {
+                vm.textTags[i] = _.without(vm.textTags[i], tag);
+            }
             if (vm.log) console.log("** removeTag (end) **");
         }
 
