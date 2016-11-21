@@ -1,5 +1,4 @@
 <!--  Buttons for the header -->
-
 <div style="position: absolute; top: 0; right:0; padding: 10px">
         <button type="button" class="btn btn-primary btn-sm"  ng-click="vm.openText()">
           <span class="glyphicon glyphicon-open"></span> Open text
@@ -7,13 +6,12 @@
         <button type="button" class="btn btn-primary btn-sm" ng-click="vm.saveText()">
           <span class="glyphicon glyphicon-save"></span> Save text
         </button>
-
-    
 </div>
 
 <!--  the text loading frame -->
-<div ng-if="vm.stateLoadingText" align="center">
-    <textarea style="width: 100%" rows="30"></textarea>
+<div ng-show="false" align="center">
+    <input id="fileReaderButton" type="file" on-read-file="showContent($fileContent)" />
+
     <button type="button" class="btn btn-success btn-sm"  ng-click="vm.loadNewText()" width="150px">
       <span class="glyphicon glyphicon-ok"></span> Load
     </button>
@@ -22,7 +20,19 @@
     </button>
 </div>
 
-<div ng-if="vm.stateWorking">
+<div ng-show="vm.texts.length === 0 && !vm.loading" class="text-center">
+        <br><br>
+        <h1>Please load text</h1><br>
+        <button type="button" class="btn btn-primary btn-sm"  ng-click="vm.openText()" style="font-size: 30px">
+          <span class="glyphicon glyphicon-open"></span> Open text
+        </button>
+</div>
+<div ng-show="vm.texts.length === 0 && vm.loading" class="text-center">
+        <br><br>
+        <h1>Loading data, please wait</h1><br>
+        <img src="images/throbber.gif">
+</div>
+<div ng-show="vm.texts.length > 0">
     <div class="col-xs-12" style="text-align: center">
         <!--<h1>Tagged Text</h1>-->
         <table width="100%">

@@ -24,6 +24,10 @@ angular.module('myApp.view1', [])
         });
     }])
     .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window) {
+        $scope.showContent = function($fileContent){
+            $scope.content = $fileContent;
+        };
+
         var vm = this;
         vm.log = true;
         vm.loadText = loadText;
@@ -37,7 +41,7 @@ angular.module('myApp.view1', [])
         vm.saveText = saveText;
         vm.cancelOpenText = cancelOpenText;
         vm.approveOpenText = approveOpenText;
-
+        vm.loading = false;
         vm.selectedIndex = 0;
         vm.startOffset = -1;
         vm.endOffset = -1;
@@ -62,20 +66,6 @@ angular.module('myApp.view1', [])
         	if (vm.log) console.log("** activate (begin) **");
             createDownAction();
             loadLabels();
-
-            vm.text = "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה\n" +
-                "בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה בלה";
 
             vm.loadText();
         	if (vm.log) console.log("** activate (end) **");
@@ -255,21 +245,25 @@ angular.module('myApp.view1', [])
             vm.taggedText = $sce.trustAsHtml(vm.textArray.join(''));
         }
 
-        function loadText() {
-            if (vm.log) console.log("** loadText (begin) **");
-            $http({
-                method: 'GET',
-                url: 'http://localhost:8000/example/seferhamitzvot.json'
-            }).then(function (response) {
-                vm.texts = response.data.subjects;
+        function loadText(content) {
+            if (!content)
+            {
+                vm.texts = [];
+            }
+            else
+            {
+                var data = JSON.parse(content);
+                vm.texts = data.subjects;
+
                 for (var i in vm.texts)
                 {
                     vm.texts[i].tagsInternal = [];
                 }
                 clearSelection();
                 loadSingleText();
-            });
-            if (vm.log) console.log("** loadText (end) **");
+                
+            }
+            vm.loading = false;
         }
 
         function removeTag(index) {
@@ -420,8 +414,15 @@ angular.module('myApp.view1', [])
         }
         
         function openText() {
-            vm.stateWorking = false;
-            vm.stateLoadingText = true;
+            var el = document.getElementById('fileReaderButton');
+            $("#fileReaderButton").on('change',function(){
+                 vm.loading = true;
+                 $timeout(function() {
+                    vm.loadText($scope.content);
+                 }, 1000);
+            });
+            el.click();
+            
         }
 
         function saveText() {
@@ -450,7 +451,7 @@ angular.module('myApp.view1', [])
                 res.push(resObj);
             }
             
-            var data = JSON.stringify(res, undefined, 2);
+            var data = JSON.stringify({subjects:res}, undefined, 2);
             var blob = new Blob([data], {type: 'text/json'});
             var filename = "oren.json";
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
@@ -480,5 +481,31 @@ angular.module('myApp.view1', [])
             vm.stateLoadingText = false;    
         }
 
-    });
+    }).directive('onReadFile', function ($parse) {
+    return {
+        restrict: 'A',
+        scope: false,
+        link: function(scope, element, attrs) {
+            var fn = $parse(attrs.onReadFile);
+            
+            element.on('change', function(onChangeEvent) {
+                var reader = new FileReader();
+                
+                reader.onload = function(onLoadEvent) {
+                    scope.$apply(function() {
+                        fn(scope, {$fileContent:onLoadEvent.target.result});
+                    });
+                };
+                try
+                {
+                    reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+                }
+                catch(err)
+                {
+                    
+                }
+            });
+        }
+    };
+});
 
