@@ -12,6 +12,9 @@ angular.module('myApp.view4', [])
             //Recompile if the template changes
             scope.$watch(getStringValue, function () {
                 $compile(element, null, -9999)(scope);  //The -9999 makes it skip directives so that we do not recompile ourselves
+                //vm.loading = false;
+                scope.loading = false;
+                
             });
         }
     }})
@@ -22,8 +25,9 @@ angular.module('myApp.view4', [])
             controllerAs: 'vm'
         });
     }])
-    .controller('View4Ctrl', function ($rootScope, $scope, $http, $sce, $timeout) {
+    .controller('View4Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal) {
         var vm = this;
+        $scope.loading = true;
         vm.log = true;
         vm.loadLabelsDB = loadLabelsDB;
         vm.loadText = loadText;
@@ -42,6 +46,7 @@ angular.module('myApp.view4', [])
         vm.textArray = [];
         vm.textTags = [];
 
+        vm.currentSelectedFilter = -1;
         activate();
 
         //////////////////////////////////////////
@@ -50,16 +55,43 @@ angular.module('myApp.view4', [])
         	if (vm.log) console.log("** activate (begin) **");
             $rootScope.down = function(e)
             {
-            	
                 if (e.keyCode === 84 && isSelectionValid() && !vm.isTagScreenOn)
                 {
                     showTagScreen();
-                    console.log('1')
+                    vm.currentSelectedFilter = -1;
                 }
                 else if (e.keyCode === 27 && isSelectionValid() && vm.isTagScreenOn)
                 {
                     closeTagScreen();
                 }
+                else if (e.keyCode === 40 && isSelectionValid() && vm.isTagScreenOn) //down
+                {
+                	if (vm.lim >= 0)
+                	{
+                		vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = false;
+                		vm.currentSelectedFilter = vm.currentSelectedFilter + 1;
+                		if (vm.currentSelectedFilter > vm.lim) vm.currentSelectedFilter = 0;
+                		vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;
+                	}
+                }
+                else if (e.keyCode === 38 && vm.isTagScreenOn) //up
+                {
+                	if (vm.lim >= 0)
+                	{
+                		vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = false;
+                		vm.currentSelectedFilter = vm.currentSelectedFilter - 1;
+                		if (vm.currentSelectedFilter < 0) vm.currentSelectedFilter = vm.lim;
+                		vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter].selected = true;                    
+                	}
+                }
+                else if (e.keyCode === 13 && vm.isTagScreenOn) //up
+                {
+                	if (vm.lim >= 0) {
+                		vm.tag(vm.labelsDBjsonFiltered.subjects[vm.currentSelectedFilter]);
+                		closeTagScreen();                    
+                	}
+                }
+            	
                 
             };
 
@@ -91,6 +123,7 @@ angular.module('myApp.view4', [])
 
             vm.loadLabelsDB();
             vm.loadText();
+            
         	if (vm.log) console.log("** activate (end) **");
         }
 
@@ -101,11 +134,18 @@ angular.module('myApp.view4', [])
 
         function showTagScreen()
         {
+        	
         	if (vm.log) console.log("** showTagScreen (begin) **");
-            vm.isTagScreenOn = true;
+        	vm.isTagScreenOn = true;
             $timeout(function (){
+            	var el = document.getElementById('tagNameInput');
+            	el.value = "";
+            	vm.filter = "";
+            	vm.updateFilter();
+            	vm.limit = -1;
             	$("#tagNameInput").focus();
-            }, 200);
+            	
+            	}, 50);
             if (vm.log) console.log("** showTagScreen (end) **");
         }
 
@@ -141,6 +181,8 @@ angular.module('myApp.view4', [])
 							                '</span>' +
                                         '</span>';
             });
+
+            
             vm.taggedText = $sce.trustAsHtml(vm.textArray.join(''));
             if (vm.log) console.log("** loadText (end) **");
         }
@@ -162,7 +204,6 @@ angular.module('myApp.view4', [])
             	b = b.split("_")[1];
             	vm.startOffset = Number(a);
                 vm.endOffset = Number(b)+1;
-                console.log(a,b)
             }
         }
 
@@ -181,6 +222,24 @@ angular.module('myApp.view4', [])
                     });
                 });
             }
+            vm.lim = Math.min(vm.labelsDBjsonFiltered.subjects.length, 10) - 1;
+            if (vm.labelsDBjsonFiltered.subjects.length > 0)
+            {
+            	if (vm.currentSelectedFilter === -1)
+            	{
+            		vm.currentSelectedFilter = 0;
+            	}
+            	else if (vm.currentSelectedFilter > vm.lim)
+            	{
+            		vm.currentSelectedFilter = vm.lim;
+            	}
+            }
+            console.log(vm.lim, vm.currentSelectedFilter)
+            
+            for (var i = 0; i<= vm.lim; i++) {
+            	vm.labelsDBjsonFiltered.subjects[i].selected = (vm.currentSelectedFilter === i);
+            }
+            
         	if (vm.log) console.log("** updateFilter (end) **");
         }
 
@@ -199,7 +258,6 @@ angular.module('myApp.view4', [])
                 	console.log(i);
                 	vm.textTags[i].push(title);
                 }
-                console.log('oren',vm.textTags);
             }
             vm.isTagScreenOn = false;
         	if (vm.log) console.log("** tag (end) **");
@@ -213,6 +271,23 @@ angular.module('myApp.view4', [])
         
         
         
+        function createTagModal() {
+            var resolve = {
+                header: 'Tag Modal'
+            };
+            return createModal('/components/modals/tagModal/tagModal.html','tagModalCtrl as vm','wide',resolve,'static');
+        }
+        function createModal(templateUrl,controller,size,resolve,backdrop) {
+            var options = {};
+            options.templateUrl = templateUrl;
+            options.controller = controller;
+            options.size = size;
+            options.resolve = resolve;
+            if (backdrop) {
+                options.backdrop = backdrop;
+            }
+            return $uibModal.open(options);
+        }
 
     });
 

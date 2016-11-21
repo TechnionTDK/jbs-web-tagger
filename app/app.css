@@ -37,21 +37,40 @@
 }
 
 .labels-filter {
+  width:100%;
   font-size: 25px;
   direction: rtl;
 
 }
 .tag-selector {
-  color: white;
+  color: black;
   font-size: 22px;
   cursor: pointer;
   margin: 0
 }
 .tag-selector:hover{
+  color: white;
+  font-size: 22px;
   cursor: pointer;
-  color: #aaffff;
-  font-weight: bold;
-  text-decoration: underline;
+  margin: 0;
+  background-color: blue;
+}
+
+.tag-selector-selected {
+
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  margin: 0;
+  background-color: darkblue;
+}
+.tag-selector-selected:hover {
+
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  margin: 0;
+  background-color: blue;
 }
 
 .tagged {
@@ -72,7 +91,7 @@
 }
 
 .tags-div {
-  width: 100%; position: absolute; top: 0; left: 0; background-color: black; height: 100%; padding: 25%; opacity: 0.9
+	width: 90%;
 
 }
 

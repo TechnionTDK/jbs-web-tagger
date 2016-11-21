@@ -1,26 +1,46 @@
+<div ng-if="loading" style="width: 100%; height: 80%; text-align: center; vertical-align: middle;"><img src="images/throbber.gif"></div>
 <div>
     <div class="col-xs-12" style="text-align: center">
         <!--<h1>Tagged Text</h1>-->
-        <pre id="taggedText" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind-html="vm.taggedText" compile-template></pre>
+        <table width="100%">
+        	<tr>
+        		<td width="20%" valign="top">
+					<div ng-show="vm.isTagScreenOn" class="text-center tags-div">
+					    <label>
+					        <input id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
+					    </label>
+					    <br>
+					    <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" ng-class="(item.selected) ? 'tag-selector-selected ' : 'tag-selector'"
+					       ng-click="vm.tag(item)">
+					        {{item.titles[0].title}}
+					    </p>
+					</div>
+				</td>
+        		<td width="70%" valign="top">
+        			<pre id="taggedText" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind-html="vm.taggedText" compile-template style="font-size: 16px"></pre>
+        		</td>
+        		<td width="10%" valign="top">
+        			<p><span class="glyphicon glyphicon-triangle-top" style="font-size: 80px; cursor: pointer;"></span></p>
+        			<p style="font-size: 45px">1</p>
+        			<p style="font-size: 12px">title of text</p>
+        			<p><span class="glyphicon glyphicon-triangle-bottom" style="font-size: 80px; cursor: pointer;"></span></p>
+        		</td>
+        	</tr>
+        </table>
+        
     </div>
-    <!--<div class="col-xs-6" style="text-align: center">-->
-        <!--<h1>Original Text</h1>-->
-        <!--<pre id="text" ng-mouseup="vm.updateSelectedText()" dir="rtl" ng-bind="vm.text"></pre>-->
-    <!--</div>-->
 </div>
 
 <!--  Tags screen -->
-<div ng-show="vm.isTagScreenOn" class="text-center tags-div">
-    <label>
-        <input id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
-    </label>
-    <br>
-    <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" class="tag-selector"
-       ng-click="vm.tag(item)">
-        {{item.titles[0].title}}
-    </p>
-</div>
 
 <script type="text/ng-template" id="popoverTemplate.html">
-    <div ng-repeat="tag in vm.textTags[vm.selectedIndex]">{{tag.title}} <a ng-click="vm.removeTag($index)">X</a></div>
+    <div style="text-align: right" class="panel panel-default" ng-repeat="tag in vm.textTags[vm.selectedIndex]">
+        <div class="panel-heading">
+            <p style="cursur: pointer">{{tag.title}}&nbsp;&nbsp;&nbsp;&nbsp;<a ng-click="vm.removeTag($index)">הסר</a></p>
+        </div>
+        <div class="panel-body">
+            <p class="col-xs-12">טקסט מתויג: {{tag.text}}</p>
+            <p class="col-xs-12">החל מתו: {{tag.startIndex}} ועד תו: {{tag.endIndex}}</p>
+        </div>
+    </div>
 </script>
