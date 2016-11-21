@@ -22,7 +22,7 @@ angular.module('myApp.directives')
                     }
                     catch(err)
                     {
-
+                        console.log('readFile - ' + err);
                     }
                 });
             }
