@@ -105,3 +105,25 @@
 .highlighted-text {
 	background-color: #80ffff
 }
+.text-selected {
+  background-color: lightgreen;
+}
+
+.save-btn {
+  width: 120px;
+  text-align:center;
+  color:white;
+  padding: 4px;
+  cursor: pointer; 
+  background-color: #3074ae; 
+  border: 1px solid lightblue; 
+  border-radius: 10px; 
+  
+}
+.save-btn-left {
+  float: left; 
+  margin: 0 1px 10px 0
+}
+.save-btn-right {
+  float: right; 
+}
