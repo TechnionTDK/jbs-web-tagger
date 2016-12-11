@@ -190,7 +190,7 @@ angular.module('myApp.view1', [])
             var curr_word_num = 1;
             vm.textArray.forEach(function (char, index) {
                 vm.textTags[index] = tags[index] || [];
-                if (char == ' ') curr_word_num++;
+                if (char === ' ') curr_word_num++;
                 vm.wordNumber.push(curr_word_num);
                 var cl = 'ng-class="(vm.highlightedText[' + index + ']) ? \'highlighted-text\' : \'\'"';
                 vm.textArray[index] = '<span ' + cl + '>' +
@@ -208,6 +208,22 @@ angular.module('myApp.view1', [])
             vm.taggedText = $sce.trustAsHtml(vm.textArray.join(''));
         }
 
+        function findIndex(wordIndex, last) {
+            var curr_word_num = 1;
+            for (var i in vm.textArray) {
+                if (curr_word_num === Number(wordIndex))
+                {
+                    if (last)
+                    {
+                        while (vm.textArray[++i] !== ' ') {}
+                        --i;
+                    }
+                    return i;
+                }
+                if (vm.textArray[i] === ' ') curr_word_num++;
+            }
+        }
+
         function loadText(content) {
             if (!content)
             {
@@ -220,12 +236,35 @@ angular.module('myApp.view1', [])
 
                 vm.texts.forEach(function (text) {
                     text.tagsInternal = [];
+                    if (text.tags) {
+                        vm.textArray = text.text.split('');
+                        text.tags.forEach(function (tag) {
+                            var wordIndexes = tag.span.split('-');
+                            tag.startWord = wordIndexes[0];
+                            tag.endWord = wordIndexes[1];
+                            tag.startIndex = findIndex(wordIndexes[0]);
+                            tag.endIndex = findIndex(wordIndexes[1], true);
+                            tag.text = text.text.substring(tag.startIndex,tag.endIndex);
+                            tag.object = findTitle(tag.uri);
+                            tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
+                            tag.title = tag.object.titles[0].title;
+                            text.tagsInternal.push(tag);
+                        });
+                    }
                 });
                 clearSelection();
                 loadSingleText();
                 
             }
             vm.loading = false;
+        }
+
+        function findTitle(uri) {
+            for (var i in vm.labelsDBjson.subjects) {
+                if (vm.labelsDBjson.subjects[i].uri === uri) {
+                    return vm.labelsDBjson.subjects[i];
+                }
+            }
         }
 
         function removeTag(index) {
@@ -436,7 +475,7 @@ angular.module('myApp.view1', [])
                     inBraces = false;
                     bracesTo = i;
                 }
-                else if (!inBraces && !inQuate && (w.startsWith('\"') || w.startsWith('\'\'')) && bracesTo == (Number(i) - 1))
+                else if (!inBraces && !inQuate && (w.startsWith('\"') || w.startsWith('\'\'')) && bracesTo === (Number(i) - 1))
                 {
                     inQuate = true;
                     quateFrom = i;
