@@ -39,6 +39,13 @@ angular.module('myApp.view1', [])
         vm.textNumber = 0;
         vm.stateWorking = true;
         vm.stateLoadingText = false;
+       
+        vm.suggestTags = suggestTags;
+        vm.prepareSave = prepareSave;
+        vm.suggestSave = suggestSave;
+        vm.saveSetAll = saveSetAll;
+        vm.cancelOpenText = cancelOpenText;
+        vm.approveOpenText = approveOpenText;
 
         activate();
 
@@ -55,6 +62,7 @@ angular.module('myApp.view1', [])
         function showContent(fileContent){
             vm.content = fileContent;
         }
+
         function clearSelection() {
             vm.startOffset = -1;
             vm.endOffset = -1;
@@ -177,10 +185,13 @@ angular.module('myApp.view1', [])
                 }
             }
             vm.textArray = vm.text.split('');
+            vm.wordNumber = [];
             vm.templateUrl = 'popoverTemplate.html';
+            var curr_word_num = 1;
             vm.textArray.forEach(function (char, index) {
                 vm.textTags[index] = tags[index] || [];
-
+                if (char == ' ') curr_word_num++;
+                vm.wordNumber.push(curr_word_num);
                 var cl = 'ng-class="(vm.highlightedText[' + index + ']) ? \'highlighted-text\' : \'\'"';
                 vm.textArray[index] = '<span ' + cl + '>' +
                     '<span ng-show="vm.textTags[' + index + '].length > 0">' +
@@ -330,6 +341,8 @@ angular.module('myApp.view1', [])
             if (vm.startOffset >= 0 && vm.endOffset > 0) {
                 var title = {};
                 title.id = titlesObj.$$hashKey + "_" + vm.startOffset + "_" + (vm.endOffset -1);
+                title.startWord = vm.wordNumber[vm.startOffset];
+                title.endWord = vm.wordNumber[vm.endOffset-1];
                 title.startIndex = vm.startOffset;
                 title.endIndex = vm.endOffset - 1;
                 title.title = titlesObj.titles[0].title;
@@ -339,6 +352,7 @@ angular.module('myApp.view1', [])
                 {
                 	vm.textTags[i].push(title);
                 }
+                vm.currTagsCount++;
             }
         	if (vm.log) console.log("** tag (end) **");
         }
@@ -360,20 +374,23 @@ angular.module('myApp.view1', [])
 
             var res = [];
             vm.texts.forEach(function (text) {
-                var resObj = {};
-                resObj.text = text.text;
-                resObj.title = text.title;
-                resObj.type = text.type;
-                resObj.uri = text.uri;
-                resObj.tags = [];
+                if (text.savingState)
+                {
+                    var resObj = {};
+                    resObj.text = text.text;
+                    resObj.title = text.title;
+                    resObj.type = text.type;
+                    resObj.uri = text.uri;
+                    resObj.tags = [];
 
-                text.tagsInternal.forEach(function (tagInternal) {
-                    var tag = {};
-                    tag.span = [tagInternal.startIndex, tagInternal.endIndex];
-                    tag.uri = tagInternal.object.uri;
-                    resObj.tags.push(tag);
-                });
-                res.push(resObj);
+                    text.tagsInternal.forEach(function (tagInternal) {
+                        var tag = {};
+                        tag.span = "" + tagInternal.startWord + "-" + tagInternal.endWord;
+                        tag.uri = tagInternal.object.uri;
+                        resObj.tags.push(tag);
+                    });
+                    res.push(resObj);
+                }
             });
             
             var data = JSON.stringify({subjects:res}, undefined, 2);
@@ -394,5 +411,84 @@ angular.module('myApp.view1', [])
               a.dispatchEvent(e);
             }
         }
-    });
+
+
+
+        function suggestTags() {
+            var txt = vm.texts[vm.textNumber].text.split(' ');
+            var bracesTo = 0;
+            var bracesFrom = 0;
+            var quateFrom = 0;
+            var quateTo = 0;
+            var inQuate = false;
+            var inBraces = false;
+
+            for (var i in txt)
+            {
+                var w = txt[i];
+                if (!inBraces && !inQuate && w.startsWith('('))
+                {
+                    inBraces = true;
+                    bracesFrom = i;
+                }
+                if (inBraces && !inQuate && w.endsWith(')'))
+                {
+                    inBraces = false;
+                    bracesTo = i;
+                }
+                else if (!inBraces && !inQuate && (w.startsWith('\"') || w.startsWith('\'\'')) && bracesTo == (Number(i) - 1))
+                {
+                    inQuate = true;
+                    quateFrom = i;
+                }
+                else if (!inBraces && inQuate && (w.endsWith('\"') || w.endsWith('\'\'') || w.endsWith('\".') || w.endsWith('\'\'.')|| w.endsWith('\",') || w.endsWith('\'\',')))
+                {
+                    inQuate = false;
+                    quateTo = i;
+                    var suggestedSource = [];
+                    var suggestedText = [];
+                    for (var b = bracesFrom; b <= bracesTo; b++)
+                    {
+                        suggestedSource.push(txt[b]);
+                    }
+                    for (var q = quateFrom; q <= quateTo; q++)
+                    {
+                        suggestedText.push(txt[q]);
+                    }
+                    alert('suggested text:\n' + suggestedText.join(' ') + '\nshould be tagged as:\n' + suggestedSource.join(' '))
+                }
+            }
+        }
+
+        function prepareSave() {
+            unloadSingleText();
+            vm.savingModalMode = 1;     //1 = show all ; 2 = show only selected
+            vm.suggestSave();
+        }
+
+        function suggestSave() {
+            for (var i in vm.texts)
+            {
+                vm.texts[i].savingState = (vm.texts[i].tagsInternal.length > 0);
+            }
+        }
+
+        function saveSetAll(flag) {
+            for (var i in vm.texts)
+            {
+                vm.texts[i].savingState = flag;
+            }
+        }
+
+        function cancelOpenText() {
+            vm.stateWorking = true;
+            vm.stateLoadingText = false;    
+        }
+        
+        function approveOpenText() {
+            vm.stateWorking = true;
+            vm.stateLoadingText = false;    
+        }
+
+});
 

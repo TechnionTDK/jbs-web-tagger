@@ -3,8 +3,11 @@
         <button type="button" class="btn btn-primary btn-sm"  ng-click="vm.openText()">
           <span class="glyphicon glyphicon-open"></span> Open text
         </button>
-        <button type="button" class="btn btn-primary btn-sm" ng-click="vm.saveText()">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#saveModal" ng-click="vm.prepareSave()">
           <span class="glyphicon glyphicon-save"></span> Save text
+        </button>
+        <button type="button" class="btn btn-success btn-sm" ng-click="vm.suggestTags()">
+          <span class="glyphicon glyphicon-flash"></span> Suggest tags
         </button>
 </div>
 
@@ -54,7 +57,7 @@
         		<td width="10%" valign="top">
         			<span ng-click="vm.loadNextText()" class="glyphicon glyphicon-triangle-top" style="font-size: 80px; cursor: pointer;"></span>
         			<p style="font-size: 45px">{{vm.textNumber + 1}}</p>
-        			<p style="font-size: 12px">{{vm.texts[vm.textNumber].title}}</p>
+                    <p style="font-size: 12px">{{vm.texts[vm.textNumber].title[0]}}</p>
         			<span ng-click="vm.loadPrevText()" class="glyphicon glyphicon-triangle-bottom" style="font-size: 80px; cursor: pointer;"></span>
         		</td>
         	</tr>
@@ -66,13 +69,56 @@
 <!--  Tags screen -->
 
 <script type="text/ng-template" id="popoverTemplate.html">
-    <div style="text-align: right" class="panel panel-default" ng-repeat="tag in vm.textTags[vm.selectedIndex]">
+    <div style="direction: rtl; text-align: right" class="panel panel-default" ng-repeat="tag in vm.textTags[vm.selectedIndex]">
         <div class="panel-heading">
             <p style="cursur: pointer">{{tag.title}}&nbsp;&nbsp;&nbsp;&nbsp;<a ng-click="vm.removeTag($index)">הסר</a></p>
         </div>
         <div class="panel-body">
             <p class="col-xs-12">טקסט מתויג: {{tag.text}}</p>
             <p class="col-xs-12">החל מתו: {{tag.startIndex}} ועד תו: {{tag.endIndex}}</p>
+            <p class="col-xs-12">החל ממילה: {{tag.startWord}} ועד מילה: {{tag.endWord}}</p>            
         </div>
     </div>
 </script>
+
+<!--  Save modal -->
+<!-- Button trigger modal -->
+<div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="direction: rtl;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Save options</h4>
+      </div>
+      <div class="modal-body">
+        <div>
+            <div width="100px" ng-click="vm.saveSetAll(true)" class="save-btn save-btn-left" >
+                Select all
+            </div>
+            <div width="100px" ng-click="vm.suggestSave()" class="save-btn save-btn-left" >
+                Select tagged
+            </div>
+            <div width="100px" ng-click="vm.saveSetAll(false)" class="save-btn save-btn-left" >
+                Clear all
+            </div>
+            <div width="100px" ng-click="vm.savingModalMode = 1" ng-show="vm.savingModalMode === 2" class="save-btn save-btn-right" >
+                Show all
+            </div>
+            <div width="100px" ng-click="vm.savingModalMode = 2" ng-show="vm.savingModalMode === 1" class="save-btn save-btn-right" >
+                Show selected
+            </div>
+        </div>
+        <hr>
+        <div style="width: 100%; height: 400px; overflow-y: auto">
+            <div ng-repeat="text in vm.texts" ng-show="(vm.savingModalMode===1) || (text.savingState)" ng-class="(text.savingState) ? 'text-selected' : '' "> 
+                    <label style="padding: 0 20px 0 20px; font-size: 15px;"><input type="checkbox" ng-model="text.savingState"> {{text.title[0]}}</label>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="vm.saveText()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
