@@ -3,7 +3,26 @@
 [![Issue Count](https://codeclimate.com/github/TechnionTDK/jbs-web-tagger/badges/issue_count.svg)](https://codeclimate.com/github/TechnionTDK/jbs-web-tagger)
 
 # jbs.tagging.frontend by angular-seed — the seed for AngularJS apps
+
 A Java-Script frontend for manually tagging JBS texts
+
+## Running the JBS Tagger
+
+Please follow the next steps in order to run the tagger locally:
+1) install node.js - https://nodejs.org/en/ (version 6.*.*)
+2) install git - https://git-scm.com/
+3) clone this repository - git clone https://github.com/TechnionTDK/jbs-web-tagger.git
+4) start the app from the directory - npm start
+5) start using the app - browse to localhost:8000
+
+## Using the JBS Tagger
+
+Please follow this steps and remember to download your work at the end
+1) upload the json file for tagging (or with tags)
+2) tag you file
+3) download your tagged json
+
+## angular-seed — the seed for AngularJS apps
 
 This project is an application skeleton for a typical [AngularJS](http://angularjs.org/) web app.
 You can use it to quickly bootstrap your angular webapp projects and dev environment for these
