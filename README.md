@@ -14,6 +14,7 @@ A Java-Script frontend for manually tagging JBS texts
 * install git - https://git-scm.com/
 * clone this repository - git clone https://github.com/TechnionTDK/jbs-web-tagger.git
 * start the app from the directory - npm start
+ * Upon first install it may take a while due to dependecy resolution.
 * start using the app - browse to localhost:8000
 
 ## Using the JBS Tagger
