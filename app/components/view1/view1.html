@@ -71,11 +71,10 @@
 <script type="text/ng-template" id="popoverTemplate.html">
     <div style="direction: rtl; text-align: right" class="panel panel-default" ng-repeat="tag in vm.textTags[vm.selectedIndex]">
         <div class="panel-heading">
-            <p style="cursur: pointer">{{tag.title}}&nbsp;&nbsp;&nbsp;&nbsp;<a ng-click="vm.removeTag($index)">הסר</a></p>
+            <p style="cursur: pointer">{{tag.title}}<button style="float: left; height: 30px" class="btn btn-primary" ng-click="vm.removeTag($index)">הסר</a></p>
         </div>
         <div class="panel-body">
-            <p class="col-xs-12">טקסט מתויג: {{tag.text}}</p>
-            <p class="col-xs-12">החל מתו: {{tag.startIndex}} ועד תו: {{tag.endIndex}}</p>
+            <p class="col-xs-12">טקסט מתויג: <font style="font-weight: bold">{{tag.text}}</font></p>
             <p class="col-xs-12">החל ממילה: {{tag.startWord}} ועד מילה: {{tag.endWord}}</p>            
         </div>
     </div>
@@ -111,7 +110,7 @@
         <hr>
         <div style="width: 100%; height: 400px; overflow-y: auto">
             <div ng-repeat="text in vm.texts" ng-show="(vm.savingModalMode===1) || (text.savingState)" ng-class="(text.savingState) ? 'text-selected' : '' "> 
-                    <label style="padding: 0 20px 0 20px; font-size: 15px;"><input type="checkbox" ng-model="text.savingState"> {{text.title[0]}}</label>
+                    <label style="padding: 0 20px 0 20px; font-size: 15px;"><input type="checkbox" ng-model="text.savingState"> {{text.titles[0]}}</label>
             </div>
         </div>
       </div>

@@ -89,6 +89,8 @@ angular.module('myApp.view1', [])
 
         function createDownAction() {
             $rootScope.down = function (e) {
+                console.log(e.keyCode);
+
                 if (e.keyCode === 40 && isSelectionValid()) //down
                 {
                     if (vm.lim >= 0) {
@@ -244,7 +246,7 @@ angular.module('myApp.view1', [])
                             tag.endWord = wordIndexes[1];
                             tag.startIndex = findIndex(wordIndexes[0]);
                             tag.endIndex = findIndex(wordIndexes[1], true);
-                            tag.text = text.text.substring(tag.startIndex,tag.endIndex);
+                            tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
                             tag.object = findTitle(tag.uri);
                             tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
                             tag.title = tag.object.titles[0].title;
@@ -273,6 +275,7 @@ angular.module('myApp.view1', [])
             for (var i = tag.startIndex; i <= tag.endIndex; ++i) {
                 vm.textTags[i] = _.without(vm.textTags[i], tag);
             }
+            clearSelection();
             if (vm.log) console.log("** removeTag (end) **");
         }
 
@@ -339,6 +342,13 @@ angular.module('myApp.view1', [])
             	}
             }
             $window.getSelection().removeAllRanges();
+            console.log(isSelectionValid())
+            if (isSelectionValid())
+            {
+                var el = document.getElementById('tagNameInput');
+                $timeout(function() {el.focus();}, 10);
+                
+            }
         }
 
         function updateFilter() {
@@ -393,6 +403,19 @@ angular.module('myApp.view1', [])
                 }
                 vm.currTagsCount++;
             }
+            else
+            {
+                console.log("no selection to tag")
+            }
+
+            for(var i = 0; i < Math.min(10,vm.labelsDBjsonFiltered.subjects.length); ++i)
+            {
+                vm.labelsDBjsonFiltered.subjects[i].selected = false;
+                
+            }
+            titlesObj.selected=true;
+            clearSelection();
+
         	if (vm.log) console.log("** tag (end) **");
         }
         
