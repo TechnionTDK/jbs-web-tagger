@@ -342,12 +342,11 @@ angular.module('myApp.view1', [])
             	}
             }
             $window.getSelection().removeAllRanges();
-            console.log(isSelectionValid())
+            console.log(isSelectionValid());
             if (isSelectionValid())
             {
                 var el = document.getElementById('tagNameInput');
                 $timeout(function() {el.focus();}, 10);
-                
             }
         }
 
@@ -498,7 +497,7 @@ angular.module('myApp.view1', [])
                     inBraces = false;
                     bracesTo = i;
                 }
-                else if (!inBraces && !inQuate && (w.startsWith('\"') || w.startsWith('\'\'')) && bracesTo === (Number(i) - 1))
+                else if (!inBraces && !inQuate && (w.startsWith('\"') || w.startsWith('\'\'')) && bracesTo == (Number(i) - 1))
                 {
                     inQuate = true;
                     quateFrom = i;
