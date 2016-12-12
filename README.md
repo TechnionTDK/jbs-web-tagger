@@ -8,7 +8,8 @@ A Java-Script frontend for manually tagging JBS texts
 
 ## Running the JBS Tagger
 
-# Please follow the next steps in order to run the tagger locally:
+### Please follow the next steps in order to run the tagger locally:
+
 * install node.js - https://nodejs.org/en/ (version 6.\*.\*)
 * install git - https://git-scm.com/
 * clone this repository - git clone https://github.com/TechnionTDK/jbs-web-tagger.git
@@ -17,21 +18,25 @@ A Java-Script frontend for manually tagging JBS texts
 
 ## Using the JBS Tagger
 
-# Please follow this steps and remember to download your work at the end
+### Please follow this steps and remember to download your work at the end
+
 * upload the json file for tagging (or with tags)
 * tag you file
 * download your tagged json
 
-# Tagging procedure
+### Tagging procedure
+
 * The tags are pre-loaded with the web application upon page init. They are based on the files in the /app/data folder
 * There is an input texts-json-file example in /app/example to try the application
 * in order to tag, first perform a selection (using you mouse) in the text. Selection is a span of words, and the tool will automaticall select the containing span of your selection
 * Once your selection matched your initial wish, select the relevant tag by writing its title name then click on it (or press enter)
 
-# Removing tags
+### Removing tags
+
 * In case you want to dismiss existing tag, just click on it, and press the remove link in the pop-up window
 
-# Semi-Auto suggestions
+### Semi-Auto suggestions
+
 * Once a text is loaded, a semi-auto suggest button will appear in the top right corner of the screen (green button)
 * Clicking on the semi auto suggest will start suggesting all noticable tags in the text to be automatically tagged for you. You may either accept or reject the tags 
 
