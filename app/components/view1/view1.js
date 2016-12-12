@@ -79,7 +79,7 @@ angular.module('myApp.view1', [])
 
         function loadNextText() {
             clearSelection();
-            if (vm.textNumber < vm.texts.length) {
+            if (vm.textNumber < vm.texts.length - 1) {
                 unloadSingleText();
                 ++vm.textNumber;
                 loadSingleText();
