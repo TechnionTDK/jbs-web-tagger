@@ -10,7 +10,7 @@ A Java-Script frontend for manually tagging JBS texts
 
 Please follow the next steps in order to run the tagger locally:
 
-* install node.js - https://nodejs.org/en/ (version 6.*.*)
+* install node.js - https://nodejs.org/en/ (version 6.\*.\*)
 * install git - https://git-scm.com/
 * clone this repository - git clone https://github.com/TechnionTDK/jbs-web-tagger.git
 * start the app from the directory - npm start
