@@ -439,7 +439,7 @@ angular.module('myApp.view1', [])
                 {
                     var resObj = {};
                     resObj.text = text.text;
-                    resObj.title = text.title;
+                    resObj.titles = text.titles;
                     resObj.type = text.type;
                     resObj.uri = text.uri;
                     resObj.tags = [];
