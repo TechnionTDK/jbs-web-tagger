@@ -9,18 +9,18 @@ A Java-Script frontend for manually tagging JBS texts
 ## Running the JBS Tagger
 
 Please follow the next steps in order to run the tagger locally:
-1) install node.js - https://nodejs.org/en/ (version 6.*.*)
-2) install git - https://git-scm.com/
-3) clone this repository - git clone https://github.com/TechnionTDK/jbs-web-tagger.git
-4) start the app from the directory - npm start
-5) start using the app - browse to localhost:8000
+1. install node.js - https://nodejs.org/en/ (version 6.*.*)
+2. install git - https://git-scm.com/
+3. clone this repository - git clone https://github.com/TechnionTDK/jbs-web-tagger.git
+4. start the app from the directory - npm start
+5. start using the app - browse to localhost:8000
 
 ## Using the JBS Tagger
 
 Please follow this steps and remember to download your work at the end
-1) upload the json file for tagging (or with tags)
-2) tag you file
-3) download your tagged json
+1. upload the json file for tagging (or with tags)
+2. tag you file
+3. download your tagged json
 
 ## angular-seed — the seed for AngularJS apps
 
