@@ -71,7 +71,7 @@
 <script type="text/ng-template" id="popoverTemplate.html">
     <div style="direction: rtl; text-align: right" class="panel panel-default" ng-repeat="tag in vm.textTags[vm.selectedIndex]">
         <div class="panel-heading">
-            <p style="cursur: pointer">{{tag.title}}<button style="float: left; height: 30px" class="btn btn-primary" ng-click="vm.removeTag($index)">הסר</a></p>
+            <p style="cursur: pointer">{{tag.title}}<button style="float: left; height: 30px" class="btn btn-primary" ng-click="vm.removeTag($index)">הסר</button></p>
         </div>
         <div class="panel-body">
             <p class="col-xs-12">טקסט מתויג: <font style="font-weight: bold">{{tag.text}}</font></p>
