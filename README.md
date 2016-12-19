@@ -287,7 +287,7 @@ Then you can start your own development web server to serve static files from a 
 running:
 
 ```
-http-server -a localhost -p 8000
+http-server -a 0.0.0.0 -p 8000
 ```
 
 Alternatively, you can choose to configure your own webserver, such as apache or nginx. Just
