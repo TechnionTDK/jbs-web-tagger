@@ -40,7 +40,7 @@
         <table width="100%">
         	<tr>
         		<td width="20%" valign="top">
-					<div class="text-center tags-div">
+					<div class="text-center tags-div" id="tagsDiv">
 					    <label>
 					        <input ng-disabled="!vm.isSelectionValid()" id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
 					    </label>
@@ -120,4 +120,42 @@
       </div>
     </div>
   </div>
+</div>
+
+
+<div ng-if="vm.suggestMode" class="suggest-hider"></div>
+<div ng-if="vm.suggestMode" class="suggest-container">
+    
+    <table width="100%" height="100%">
+        <tr  class="suggestions-title">
+            <td colspan="5" class="text-center">
+                <i class="glyphicon glyphicon-remove close-icon" ng-click="vm.suggestionsClose()"></i>
+                <h3>Automatic Tag Suggestions</h3>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <pre id="taggedText" style="text-direction:rtl;font-size: 16px; white-space: pre-wrap; overflow: hidden;" >
+                    <font ng-class="vm.s.p1.className">{{vm.s.p1.text}}</font><font ng-class="vm.s.p2.className">{{vm.s.p2.text}}</font><font ng-class="vm.s.p3.className">{{vm.s.p3.text}}</font><font ng-class="vm.s.p4.className">{{vm.s.p4.text}}</font><font ng-class="vm.s.p5.className">{{vm.s.p5.text}}</font>
+                </pre>
+            </td>
+        </tr>
+        <tr style="height: 50px">
+            <td width="10%">
+                
+            </td>
+            <td width="35%">
+                  <button type="button" class="btn btn-success btn-block" ng-click="vm.suggestionApply()">Apply</button>
+            </td>
+            <td width="10%">
+                
+            </td>
+            <td width="35%">
+                <button type="button" class="btn btn-danger btn-block" ng-click="vm.suggestionDissmiss()">Dissmiss</button>
+            </td>
+            <td width="10%">
+                
+            </td>
+        </tr>
+    </table>
 </div>
