@@ -8,7 +8,7 @@ angular.module('myApp.view1', [])
             controllerAs: 'vm'
         });
     }])
-    .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window) {
+    .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window, $location) {
         var vm = this;
         vm.labelsDBjsonFiltered = {};
         vm.labelsDBjsonFiltered.subjects = [];
@@ -126,16 +126,17 @@ angular.module('myApp.view1', [])
         }
 
         function loadLabels() {
+            var host = $location.host();
             $http({
                 method: 'GET',
-                url: 'http://localhost:8000/data/'
+                url: 'http://' + host + ':8000/data/'
             }).then(function (response) {
                 vm.files = response.data;
                 vm.files.replace(/>/g, ' ').replace(/</g, ' ').split(' ').forEach(function (file) {
                     if (file.endsWith('.json')) {
                         $http({
                             method: 'GET',
-                            url: 'http://localhost:8000/data/' + file
+                            url: 'http://' + host + ':8000/data/' + file
                         }).then(function (content) {
                             vm.labelsDBjson.subjects = vm.labelsDBjson.subjects.concat(content.data.subjects);
                         }, errorCallback);
