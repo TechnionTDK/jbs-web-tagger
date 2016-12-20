@@ -91,19 +91,22 @@
 }
 
 .tags-div {
-	width: 90%;
-
+  position:fixed;
+  left: 1%;
+  top: 72px;
+  width: 18.7% !important;
+  
 }
 
 
 .tagged-text {
-	text-decoration: underline;
-	color: blue;
-	cursor: pointer;
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
 }
 
 .highlighted-text {
-	background-color: #80ffff
+  background-color: #80ffff
 }
 .text-selected {
   background-color: lightgreen;
@@ -126,4 +129,54 @@
 }
 .save-btn-right {
   float: right; 
+}
+
+
+
+.suggest-hider {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  opacity: 0.9;
+}
+
+.suggest-container {
+  position: fixed;
+  top: 20%;
+  left: 20%;
+  height: 60%;
+  width: 60%;
+  background-color: white;
+  opacity: 1;
+  border: 1px solid black;
+}
+
+.suggested-span {
+  
+}
+
+.suggestions-title {
+  height:50px; background-color: rgb(227,242,253);
+  color: rgb(51,160,220);
+}
+
+.suggested-tag-name {
+  background-color: #666666;
+  color:white;
+}
+
+.suggested-tag-text {
+  background-color: yellow;
+  font-weight: bolder;
+  text-decoration: underline;
+}
+
+
+.close-icon {
+  float: right;
+  padding: 10px;
+  cursor: pointer;
 }

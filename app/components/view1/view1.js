@@ -10,7 +10,8 @@ angular.module('myApp.view1', [])
     }])
     .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window) {
         var vm = this;
-
+        vm.labelsDBjsonFiltered = {};
+        vm.labelsDBjsonFiltered.subjects = [];
         vm.updateSelectedText = updateSelectedText;
         vm.updateFilter = updateFilter;
         vm.tag = tag;
@@ -47,6 +48,10 @@ angular.module('myApp.view1', [])
         vm.cancelOpenText = cancelOpenText;
         vm.approveOpenText = approveOpenText;
 
+
+        vm.suggestionsClose = suggestionsClose;
+        vm.suggestionApply = suggestionApply;
+        vm.suggestionDissmiss = suggestionDissmiss;
         activate();
 
         //////////////////////////////////////////
@@ -233,32 +238,37 @@ angular.module('myApp.view1', [])
             }
             else
             {
-                var data = JSON.parse(content);
-                vm.texts = data.subjects;
+                vm.loading = true;
+                vm.texts = [];
+                $timeout(function() {
+                    var data = JSON.parse(content);
+                    vm.texts = data.subjects;
 
-                vm.texts.forEach(function (text) {
-                    text.tagsInternal = [];
-                    if (text.tags) {
-                        vm.textArray = text.text.split('');
-                        text.tags.forEach(function (tag) {
-                            var wordIndexes = tag.span.split('-');
-                            tag.startWord = wordIndexes[0];
-                            tag.endWord = wordIndexes[1];
-                            tag.startIndex = findIndex(wordIndexes[0]);
-                            tag.endIndex = findIndex(wordIndexes[1], true);
-                            tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
-                            tag.object = findTitle(tag.uri);
-                            tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
-                            tag.title = tag.object.titles[0].title;
-                            text.tagsInternal.push(tag);
-                        });
-                    }
-                });
-                clearSelection();
-                loadSingleText();
+                    vm.texts.forEach(function (text) {
+                        text.tagsInternal = [];
+                        if (text.tags) {
+                            vm.textArray = text.text.split('');
+                            text.tags.forEach(function (tag) {
+                                var wordIndexes = tag.span.split('-');
+                                tag.startWord = wordIndexes[0];
+                                tag.endWord = wordIndexes[1];
+                                tag.startIndex = findIndex(wordIndexes[0]);
+                                tag.endIndex = findIndex(wordIndexes[1], true);
+                                tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
+                                tag.object = findTitle(tag.uri);
+                                tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
+                                tag.title = tag.object.titles[0].title;
+                                text.tagsInternal.push(tag);
+                            });
+                        }
+                    });
+                    clearSelection();
+                    loadSingleText();                    
+                    vm.loading = false;
+                }, 10);
                 
             }
-            vm.loading = false;
+            
         }
 
         function findTitle(uri) {
@@ -349,6 +359,7 @@ angular.module('myApp.view1', [])
                 $timeout(function() {el.focus();}, 10);
             }
         }
+
 
         function updateFilter() {
         	if (vm.log) console.log("** updateFilter (begin) **");
@@ -474,7 +485,7 @@ angular.module('myApp.view1', [])
         }
 
 
-
+        vm.suggestions = [];
         function suggestTags() {
             var txt = vm.texts[vm.textNumber].text.split(' ');
             var bracesTo = 0;
@@ -484,6 +495,7 @@ angular.module('myApp.view1', [])
             var inQuate = false;
             var inBraces = false;
 
+            vm.suggestions = [];
             for (var i in txt)
             {
                 var w = txt[i];
@@ -506,20 +518,120 @@ angular.module('myApp.view1', [])
                 {
                     inQuate = false;
                     quateTo = i;
-                    var suggestedSource = [];
-                    var suggestedText = [];
-                    for (var b = bracesFrom; b <= bracesTo; b++)
+
+                    var currtxt;
+                    var partial_1 = {'className' : 'suggested-span'};
+                    var partial_2 = {'className' : 'suggested-span'};
+                    var partial_3 = {'className' : 'suggested-span'};
+                    var partial_4 = {'className' : 'suggested-span'};
+                    var partial_5 = {'className' : 'suggested-span'};
+                    console.log(bracesFrom,bracesTo,quateFrom,quateTo)
+                    // building p1
+                    currtxt = [];
+                    var c = 0;
+                    for (var b = 0; b < Math.min(bracesFrom, quateFrom); b++)
                     {
-                        suggestedSource.push(txt[b]);
+                        currtxt.push(txt[b]);
                     }
-                    for (var q = quateFrom; q <= quateTo; q++)
+                    partial_1.text = currtxt.join(' ') + ' ';
+                    partial_1.index = c;
+                    c += partial_1.text.length;
+                    // building p2
+                    currtxt = [];
+                    for (var b = Math.min(bracesFrom, quateFrom); b <= Math.min(bracesTo, quateTo); b++)
                     {
-                        suggestedText.push(txt[q]);
+                        currtxt.push(txt[b]);
                     }
-                    alert('suggested text:\n' + suggestedText.join(' ') + '\nshould be tagged as:\n' + suggestedSource.join(' '))
+                    partial_2.text = currtxt.join(' ');
+                    partial_2.index = c;
+                    c += partial_2.text.length;
+                    partial_2.className += ' suggested-tag-name';
+                    currtxt = [];
+                    for (var b = (Math.min(bracesTo, quateTo) + 1); b < Math.max(bracesFrom, quateFrom); b++)
+                    {
+                        currtxt.push(txt[b]);
+                    }
+                    partial_3.text = (currtxt.length === 0) ? ' ' : ' ' + currtxt.join(' ') + ' ';
+                    partial_3.index = c;
+                    c += partial_3.text.length;
+                    // building p4
+                    currtxt = [];
+                    for (var b = Math.max(bracesFrom, quateFrom); b <= Math.max(bracesTo, quateTo); b++)
+                    {
+                        currtxt.push(txt[b]);
+                    }
+                    partial_4.text = currtxt.join(' ');
+                    partial_4.index = c;
+                    c += partial_4.text.length;
+                    partial_4.className += ' suggested-tag-text';
+                    // building p5
+                    currtxt = [];
+                    for (var b = Math.max(bracesTo, quateTo) + 1; b < txt.length; b++)
+                    {
+                        currtxt.push(txt[b]);
+                    }
+                    partial_5.text = (currtxt.length === 0) ? '' : ' ' + currtxt.join(' ');
+                    partial_5.index = c;
+
+                    var suggestion = {};
+                    suggestion.p1 = partial_1;
+                    suggestion.p2 = partial_2;
+                    suggestion.p3 = partial_3;
+                    suggestion.p4 = partial_4;
+                    suggestion.p5 = partial_5;
+                    console.log(getTag(suggestion.p2.text));
+                    console.log(findTagsByName(getTag(suggestion.p2.text)));
+
+                    suggestion.tags = findTagsByName(getTag(suggestion.p2.text));
+                    vm.suggestions.push(suggestion);
+
                 }
             }
+            suggestMode();            
         }
+        vm.suggestMode = false;
+        function suggestMode() {
+            if (vm.suggestions.length === 0)
+            {
+                alert("אין המלצות לטקסט זה");
+            }
+            else
+            {
+                vm.suggestMode = true;
+                vm.currentSuggestion = 0;
+                vm.s = vm.suggestions[vm.currentSuggestion];
+            }
+        }
+
+        function getTag(source) {
+            function escapeRegExp(str) {
+                return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+            }
+
+            function replaceAll(str, find, replace) {
+              return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+            }
+            var str = source;
+            str = replaceAll(str, "(","");
+            str = replaceAll(str, ")","");
+            str = replaceAll(str, "-"," ");
+            return str;
+        }
+
+        function findTagsByName(name) {
+            var tags = [];
+            vm.labelsDBjson.subjects.forEach(function (titlesObj) {
+                titlesObj.titles.every(function (title) {
+                    if (title.title.includes(name)) {
+                        tags.push(titlesObj);
+                        return false;
+                    }
+                    return true;
+                });
+            });
+            return tags;
+        }
+
 
         function prepareSave() {
             unloadSingleText();
@@ -551,5 +663,33 @@ angular.module('myApp.view1', [])
             vm.stateLoadingText = false;    
         }
 
+
+        function suggestionsClose() {
+            vm.suggestions = [];
+            vm.suggestMode = false;   
+        }
+        function suggestionApply() {
+            // todo - add tag
+            console.log(vm.s);
+            vm.startOffset =  vm.s.p4.index; 
+            vm.endOffset = vm.s.p5.index;
+            tag(vm.s.tags[0]);
+            nextSuggestion();
+        }
+        function suggestionDissmiss() {
+            nextSuggestion();   
+        }
+
+        function nextSuggestion() {
+            vm.currentSuggestion++;
+            if (vm.currentSuggestion >= vm.suggestions.length)
+            {
+                suggestionsClose();
+            }
+            else
+            {
+                vm.s = vm.suggestions[vm.currentSuggestion];
+            }
+        }
 });
 
