@@ -258,8 +258,8 @@ angular.module('myApp.view1', [])
                                     tag.startIndex = findIndex(wordIndexes[0]);
                                     tag.endIndex = findIndex(wordIndexes[1], true);
                                     tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
-                                    tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
                                     tag.object = findTitle(tag.uri);
+                                    tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
                                     tag.title = tag.object.titles[0].title;
                                     text.tagsInternal.push(tag);
                                 });
