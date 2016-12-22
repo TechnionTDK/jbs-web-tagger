@@ -8,7 +8,7 @@ angular.module('myApp.view1', [])
             controllerAs: 'vm'
         });
     }])
-    .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window, $location) {
+    .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window, $location, $route) {
         var vm = this;
         vm.labelsDBjsonFiltered = {};
         vm.labelsDBjsonFiltered.subjects = [];
@@ -40,7 +40,8 @@ angular.module('myApp.view1', [])
         vm.textNumber = 0;
         vm.stateWorking = true;
         vm.stateLoadingText = false;
-       
+        vm.suggestions = [];
+
         vm.suggestTags = suggestTags;
         vm.prepareSave = prepareSave;
         vm.suggestSave = suggestSave;
@@ -242,29 +243,36 @@ angular.module('myApp.view1', [])
                 vm.loading = true;
                 vm.texts = [];
                 $timeout(function() {
-                    var data = JSON.parse(content);
-                    vm.texts = data.subjects;
+                    try {
+                        var data = JSON.parse(content);
+                        vm.texts = data.subjects;
 
-                    vm.texts.forEach(function (text) {
-                        text.tagsInternal = [];
-                        if (text.tags) {
-                            vm.textArray = text.text.split('');
-                            text.tags.forEach(function (tag) {
-                                var wordIndexes = tag.span.split('-');
-                                tag.startWord = wordIndexes[0];
-                                tag.endWord = wordIndexes[1];
-                                tag.startIndex = findIndex(wordIndexes[0]);
-                                tag.endIndex = findIndex(wordIndexes[1], true);
-                                tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
-                                tag.object = findTitle(tag.uri);
-                                tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
-                                tag.title = tag.object.titles[0].title;
-                                text.tagsInternal.push(tag);
-                            });
-                        }
-                    });
-                    clearSelection();
-                    loadSingleText();                    
+                        vm.texts.forEach(function (text) {
+                            text.tagsInternal = [];
+                            if (text.tags) {
+                                vm.textArray = text.text.split('');
+                                text.tags.forEach(function (tag) {
+                                    var wordIndexes = tag.span.split('-');
+                                    tag.startWord = wordIndexes[0];
+                                    tag.endWord = wordIndexes[1];
+                                    tag.startIndex = findIndex(wordIndexes[0]);
+                                    tag.endIndex = findIndex(wordIndexes[1], true);
+                                    tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
+                                    tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
+                                    tag.object = findTitle(tag.uri);
+                                    tag.title = tag.object.titles[0].title;
+                                    text.tagsInternal.push(tag);
+                                });
+                            }                        
+                            clearSelection();
+                            loadSingleText();                    
+                        });
+                    }
+                    catch(e) {
+                        if (vm.log) console.log(e);
+                        $window.alert("Data is corrupted, please fix data and try again - " + e.message);
+                        $route.reload();
+                    }
                     vm.loading = false;
                 }, 10);
                 
@@ -434,6 +442,7 @@ angular.module('myApp.view1', [])
             var el = document.getElementById('fileReaderButton');
             $("#fileReaderButton").on('change',function(){
                  vm.loading = true;
+
                  $timeout(function() {
                     loadText(vm.content);
                  }, 1000);
@@ -486,7 +495,6 @@ angular.module('myApp.view1', [])
         }
 
 
-        vm.suggestions = [];
         function suggestTags() {
             var txt = vm.texts[vm.textNumber].text.split(' ');
             var bracesTo = 0;
