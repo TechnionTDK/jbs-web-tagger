@@ -8,7 +8,7 @@ angular.module('myApp.view1', [])
             controllerAs: 'vm'
         });
     }])
-    .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window, $location) {
+    .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window, $location, $route) {
         var vm = this;
         vm.labelsDBjsonFiltered = {};
         vm.labelsDBjsonFiltered.subjects = [];
@@ -241,7 +241,6 @@ angular.module('myApp.view1', [])
             else
             {
                 vm.loading = true;
-                vm.err = undefined;
                 vm.texts = [];
                 $timeout(function() {
                     try {
@@ -271,7 +270,8 @@ angular.module('myApp.view1', [])
                     }
                     catch(e) {
                         if (vm.log) console.log(e);
-                        vm.err = e.message;
+                        $window.alert("Data is corrupted, please fix data and try again - " + e.message);
+                        $route.reload();
                     }
                     vm.loading = false;
                 }, 10);
@@ -442,7 +442,6 @@ angular.module('myApp.view1', [])
             var el = document.getElementById('fileReaderButton');
             $("#fileReaderButton").on('change',function(){
                  vm.loading = true;
-                 vm.err = undefined;
 
                  $timeout(function() {
                     loadText(vm.content);
