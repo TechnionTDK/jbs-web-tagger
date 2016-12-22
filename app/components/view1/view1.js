@@ -25,7 +25,6 @@ angular.module('myApp.view1', [])
 
         vm.log = true;
         vm.loading = false;
-        vm.err = false;
         vm.selectedIndex = 0;
         vm.startOffset = -1;
         vm.endOffset = -1;
@@ -41,7 +40,8 @@ angular.module('myApp.view1', [])
         vm.textNumber = 0;
         vm.stateWorking = true;
         vm.stateLoadingText = false;
-       
+        vm.suggestions = [];
+
         vm.suggestTags = suggestTags;
         vm.prepareSave = prepareSave;
         vm.suggestSave = suggestSave;
@@ -241,7 +241,7 @@ angular.module('myApp.view1', [])
             else
             {
                 vm.loading = true;
-                vm.err = false;
+                vm.err = undefined;
                 vm.texts = [];
                 $timeout(function() {
                     try {
@@ -270,8 +270,8 @@ angular.module('myApp.view1', [])
                         });
                     }
                     catch(e) {
-                        console.log('oren',e);
-                        vm.err = true;
+                        if (vm.log) console.log(e);
+                        vm.err = e.message;
                     }
                     vm.loading = false;
                 }, 10);
@@ -442,7 +442,7 @@ angular.module('myApp.view1', [])
             var el = document.getElementById('fileReaderButton');
             $("#fileReaderButton").on('change',function(){
                  vm.loading = true;
-                 vm.err = false;
+                 vm.err = undefined;
 
                  $timeout(function() {
                     loadText(vm.content);
@@ -496,7 +496,6 @@ angular.module('myApp.view1', [])
         }
 
 
-        vm.suggestions = [];
         function suggestTags() {
             var txt = vm.texts[vm.textNumber].text.split(' ');
             var bracesTo = 0;
