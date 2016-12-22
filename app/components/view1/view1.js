@@ -25,6 +25,7 @@ angular.module('myApp.view1', [])
 
         vm.log = true;
         vm.loading = false;
+        vm.err = false;
         vm.selectedIndex = 0;
         vm.startOffset = -1;
         vm.endOffset = -1;
@@ -240,31 +241,38 @@ angular.module('myApp.view1', [])
             else
             {
                 vm.loading = true;
+                vm.err = false;
                 vm.texts = [];
                 $timeout(function() {
-                    var data = JSON.parse(content);
-                    vm.texts = data.subjects;
+                    try {
+                        var data = JSON.parse(content);
+                        vm.texts = data.subjects;
 
-                    vm.texts.forEach(function (text) {
-                        text.tagsInternal = [];
-                        if (text.tags) {
-                            vm.textArray = text.text.split('');
-                            text.tags.forEach(function (tag) {
-                                var wordIndexes = tag.span.split('-');
-                                tag.startWord = wordIndexes[0];
-                                tag.endWord = wordIndexes[1];
-                                tag.startIndex = findIndex(wordIndexes[0]);
-                                tag.endIndex = findIndex(wordIndexes[1], true);
-                                tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
-                                tag.object = findTitle(tag.uri);
-                                tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
-                                tag.title = tag.object.titles[0].title;
-                                text.tagsInternal.push(tag);
-                            });
-                        }
-                    });
-                    clearSelection();
-                    loadSingleText();                    
+                        vm.texts.forEach(function (text) {
+                            text.tagsInternal = [];
+                            if (text.tags) {
+                                vm.textArray = text.text.split('');
+                                text.tags.forEach(function (tag) {
+                                    var wordIndexes = tag.span.split('-');
+                                    tag.startWord = wordIndexes[0];
+                                    tag.endWord = wordIndexes[1];
+                                    tag.startIndex = findIndex(wordIndexes[0]);
+                                    tag.endIndex = findIndex(wordIndexes[1], true);
+                                    tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
+                                    tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
+                                    tag.object = findTitle(tag.uri);
+                                    tag.title = tag.object.titles[0].title;
+                                    text.tagsInternal.push(tag);
+                                });
+                            }                        
+                            clearSelection();
+                            loadSingleText();                    
+                        });
+                    }
+                    catch(e) {
+                        console.log('oren',e);
+                        vm.err = true;
+                    }
                     vm.loading = false;
                 }, 10);
                 
@@ -434,6 +442,8 @@ angular.module('myApp.view1', [])
             var el = document.getElementById('fileReaderButton');
             $("#fileReaderButton").on('change',function(){
                  vm.loading = true;
+                 vm.err = false;
+
                  $timeout(function() {
                     loadText(vm.content);
                  }, 1000);
