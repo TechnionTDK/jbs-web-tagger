@@ -8,7 +8,7 @@ angular.module('myApp.view1', [])
             controllerAs: 'vm'
         });
     }])
-    .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window, $location, $route) {
+    .controller('View1Ctrl', function ($rootScope, $scope, $http, $sce, $timeout, $uibModal, $window, $location, $route, localStorageService) {
         var vm = this;
         vm.labelsDBjsonFiltered = {};
         vm.labelsDBjsonFiltered.subjects = [];
@@ -41,6 +41,7 @@ angular.module('myApp.view1', [])
         vm.stateWorking = true;
         vm.stateLoadingText = false;
         vm.suggestions = [];
+        vm.content = localStorageService.get('content');
 
         vm.suggestTags = suggestTags;
         vm.prepareSave = prepareSave;
@@ -65,8 +66,9 @@ angular.module('myApp.view1', [])
         	if (vm.log) console.log("** activate (end) **");
         }
 
-        function showContent(fileContent){
+        function showContent(fileContent) {
             vm.content = fileContent;
+            localStorageService.set('content', fileContent);
         }
 
         function clearSelection() {
@@ -172,6 +174,7 @@ angular.module('myApp.view1', [])
                     }
                 }
             }
+            localStorageService.set('texts', vm.texts);
         }
 
         function loadSingleText() {
@@ -236,7 +239,13 @@ angular.module('myApp.view1', [])
         function loadText(content) {
             if (!content)
             {
-                vm.texts = [];
+                vm.texts = localStorageService.get('texts');
+                if (vm.texts) {
+                    loadSingleText();
+                }
+                else {
+                    vm.texts = [];
+                }
             }
             else
             {
