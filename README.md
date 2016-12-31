@@ -228,40 +228,15 @@ If JDK is not already installed, you can download it [here][jdk-download].
 
 ## Updating Angular
 
-Previously we recommended that you merge in changes to angular-seed into your own fork of the project.
-Now that the angular framework library code and tools are acquired through package managers (npm and
-bower) you can use these tools instead to update the dependencies.
-
-You can update the tool dependencies by running:
-
+Since the Angular framework library code and tools are acquired through package managers (npm and bower) 
+you can use these tools to easily update the dependencies. Simply run the preconfigured script:
+ 
 ```
-npm update
+npm run update-deps
 ```
 
-This will find the latest versions that match the version ranges specified in the `package.json` file.
-
-You can update the Angular dependencies by running:
-
-```
-bower update
-```
-
-This will find the latest versions that match the version ranges specified in the `bower.json` file.
-
-
-## Loading Angular Asynchronously
-
-The angular-seed project supports loading the framework and application scripts asynchronously.  The
-special `index-async.html` is designed to support this style of loading.  For it to work you must
-inject a piece of Angular JavaScript into the HTML page.  The project has a predefined script to help
-do this.
-
-```
-npm run update-index-async
-```
-
-This will copy the contents of the `angular-loader.js` library file into the `index-async.html` page.
-You can run this every time you update the version of Angular that you are using.
+This will call `npm update` and `bower update`, which in turn will find and install the latestversions that match the 
+version ranges specified in the `package.json` and `bower.json` filesrespectively.
 
 
 ## Serving the Application Files
@@ -320,6 +295,7 @@ tests when you push to GitHub.
 
 You will need to enable the integration between Travis and GitHub. See the Travis website for more
 instruction on how to do this.
+
 
 ## Contact
 
