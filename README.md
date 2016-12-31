@@ -4,7 +4,7 @@
 
 # jbs.tagging.frontend by angular-seed — the seed for AngularJS apps
 
-A Java-Script frontend for manually tagging JBS texts
+A Java-Script frontend for manually tagging JBS texts - http://tdk-p6.cs.technion.ac.il:8000
 
 ## Running the JBS Tagger
 
