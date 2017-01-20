@@ -259,17 +259,32 @@ angular.module('myApp.view1', [])
                         vm.texts.forEach(function (text) {
                             text.tagsInternal = [];
                             if (text.tags) {
-                                vm.textArray = text.text.split('');
+                                if (text.text) {
+                                    vm.textArray = text.text.split('');
+                                }
+                                else {
+                                    vm.textArray = text['jbo:text'].split('');
+                                }
                                 text.tags.forEach(function (tag) {
                                     var wordIndexes = tag.span.split('-');
                                     tag.startWord = wordIndexes[0];
                                     tag.endWord = wordIndexes[1];
                                     tag.startIndex = findIndex(wordIndexes[0]);
                                     tag.endIndex = findIndex(wordIndexes[1], true);
-                                    tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
+                                    if (text.text) {
+                                        tag.text = text.text.substring(tag.startIndex,tag.endIndex+1);
+                                    }
+                                    else {
+                                        tag.text = text['jbo:text'].substring(tag.startIndex,tag.endIndex+1);
+                                    }
                                     tag.object = findTitle(tag.uri);
                                     tag.id = tag.object.$$hashKey + "_" + tag.startIndex + "_" + tag.endIndex;
-                                    tag.title = tag.object.titles[0].title;
+                                    if (tag.object['rdfs:label']) {
+                                        tag.title = tag.object['rdfs:label'];
+                                    }
+                                    else {
+                                        tag.title = tag.object.titles[0].title;
+                                    }
                                     text.tagsInternal.push(tag);
                                 });
                             }                        
@@ -422,7 +437,12 @@ angular.module('myApp.view1', [])
                 title.endWord = vm.wordNumber[vm.endOffset-1];
                 title.startIndex = vm.startOffset;
                 title.endIndex = vm.endOffset - 1;
-                title.title = titlesObj.titles[0].title;
+                if (titlesObj['rdfs:label']) {
+                    title.title = titlesObj['rdfs:label'];
+                }
+                else {
+                    title.title = titlesObj.titles[0].title;
+                }
                 title.text = vm.text.substring(vm.startOffset,vm.endOffset);
                 title.object = titlesObj;
                 for (var i = title.startIndex; i < vm.endOffset; i++)
@@ -468,7 +488,12 @@ angular.module('myApp.view1', [])
                 if (text.savingState)
                 {
                     var resObj = {};
-                    resObj.text = text.text;
+                    if (text.text) {
+                        resObj.text = text.text;
+                    }
+                    else {
+                        resObj['jbo:text'] = text['jbo:text'];
+                    }
                     resObj.titles = text.titles;
                     resObj.type = text.type;
                     resObj.uri = text.uri;
@@ -505,7 +530,14 @@ angular.module('myApp.view1', [])
 
 
         function suggestTags() {
-            var txt = vm.texts[vm.textNumber].text.split(' ');
+            var text = vm.texts[vm.textNumber];
+            var txt;
+            if (text.text) {
+                txt = text.text.split(' ');
+            }
+            else {
+                txt = text['jbo:text'].split(' ');
+            }
             var bracesTo = 0;
             var bracesFrom = 0;
             var quateFrom = 0;
