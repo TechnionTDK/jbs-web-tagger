@@ -178,7 +178,12 @@ angular.module('myApp.view1', [])
         }
 
         function loadSingleText() {
-            vm.text = vm.texts[vm.textNumber].text;
+            if (vm.texts[vm.textNumber].text) {
+                vm.text = vm.texts[vm.textNumber].text;
+            }
+            else {
+                vm.text = vm.texts[vm.textNumber]['jbo:text'];
+            }
             var tags = {};
 
             if (vm.texts[vm.textNumber].tagsInternal)
