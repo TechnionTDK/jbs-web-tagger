@@ -45,9 +45,9 @@
 					        <input ng-disabled="!vm.isSelectionValid()" id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
 					    </label>
 					    <br>
-					    <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" ng-class="(item.selected) ? 'tag-selector-selected ' : 'tag-selector'"
-					       ng-click="vm.tag(item)">
-					        {{item.titles[0].title}}
+					    <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" ng-class="(item.selected) ? 'tag-selector-selected ' : 'tag-selector'" ng-click="vm.tag(item)">
+                            <span ng-if="item.titles">{{item.titles[0].title}}</span>
+                            <span ng-if="item['rdfs:label']">{{item['rdfs:label']}}</span>
 					    </p>
 					</div>
 				</td>
