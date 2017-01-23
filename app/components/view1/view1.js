@@ -481,7 +481,8 @@ angular.module('myApp.view1', [])
         
         function openText() {
             var el = document.getElementById('fileReaderButton');
-            $("#fileReaderButton").on('change',function(){
+            $("#fileReaderButton").on('change',function(result){
+                vm.fileName = result.target.files[0].name;
                  vm.loading = true;
 
                  $timeout(function() {
@@ -523,15 +524,14 @@ angular.module('myApp.view1', [])
             
             var data = JSON.stringify({subjects:res}, undefined, 2);
             var blob = new Blob([data], {type: 'text/json'});
-            var filename = "oren.json";
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-              window.navigator.msSaveOrOpenBlob(blob, filename);
+              window.navigator.msSaveOrOpenBlob(blob, vm.fileName);
             }
             else{
               var e = document.createEvent('MouseEvents'),
                   a = document.createElement('a');
 
-              a.download = filename;
+              a.download = vm.fileName;
               a.href = window.URL.createObjectURL(blob);
               a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
               e.initEvent('click', true, false, window,
