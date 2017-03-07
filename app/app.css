@@ -180,3 +180,9 @@
   padding: 10px;
   cursor: pointer;
 }
+
+
+.focused-z {
+  z-index: 10;
+  background-color: white
+}

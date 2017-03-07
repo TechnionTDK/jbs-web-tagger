@@ -9,11 +9,18 @@
         <button type="button" class="btn btn-success btn-sm" ng-click="vm.suggestTags()">
           <span class="glyphicon glyphicon-flash"></span> Suggest tags
         </button>
+        <button type="button" class="btn btn-success btn-sm" ng-click="vm.openRegEx()">
+          <span class="glyphicon glyphicon-sunglasses"></span> search regex
+        </button>
+        <button type="button" class="btn btn-success btn-sm" ng-click="vm.autoTag()">
+          <span class="glyphicon glyphicon-plane"></span> auto tag
+        </button>
 </div>
 
 <!--  the text loading frame -->
 <div hidden align="center">
     <input id="fileReaderButton" type="file" read-file="vm.showContent($fileContent)" />
+    <input id="regexReaderButton" type="file" read-file="vm.translateRegex($fileContent)" />
 
     <button type="button" class="btn btn-success btn-sm" width="150px">
       <span class="glyphicon glyphicon-ok"></span> Load
@@ -40,9 +47,9 @@
         <table width="100%">
         	<tr>
         		<td width="20%" valign="top">
-					<div class="text-center tags-div" id="tagsDiv">
+					<div class="text-center tags-div focused-z" id="tagsDiv">
 					    <label>
-					        <input ng-disabled="!vm.isSelectionValid()" id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
+					        <input ng-disabled="!vm.isSelectionValid() && !vm.suggestMode" id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
 					    </label>
 					    <br>
 					    <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" ng-class="(item.selected) ? 'tag-selector-selected ' : 'tag-selector'" ng-click="vm.tag(item)">
@@ -145,7 +152,7 @@
                 
             </td>
             <td width="35%">
-                  <button type="button" class="btn btn-success btn-block" ng-click="vm.suggestionApply()">Apply</button>
+                  <button type="button" class="btn btn-success btn-block" ng-click="vm.suggestionApply()" ng-disabled="!vm.isTitleSelected">Apply</button>
             </td>
             <td width="10%">
                 
