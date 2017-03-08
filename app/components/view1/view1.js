@@ -847,17 +847,24 @@ angular.module('myApp.view1', [])
         function findTagsByName(name) {
             var tags = [];
             vm.labelsDBjson.subjects.forEach(function (titlesObj) {
-                titlesObj.titles.every(function (title) {
-                    if (title.title.includes(name)) {
+                if (titlesObj['rdfs:label']) {
+                    if (titlesObj['rdfs:label'].includes(name)) {
                         tags.push(titlesObj);
                         return false;
                     }
                     return true;
-                });
+                } else if (titlesObj.titles) {
+                    titlesObj.titles.every(function (title) {
+                        if (title.title.includes(name)) {
+                            tags.push(titlesObj);
+                            return false;
+                        }
+                        return true;
+                    });
+                }
             });
             return tags;
         }
-
 
         function prepareSave() {
             unloadSingleText();
