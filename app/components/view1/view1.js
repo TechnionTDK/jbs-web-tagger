@@ -517,6 +517,7 @@ angular.module('myApp.view1', [])
                  vm.loading = true;
 
                  $timeout(function() {
+                    vm.textNumber = 0;
                     loadText(vm.content);
                  }, 1000);
             });
