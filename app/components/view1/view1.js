@@ -420,7 +420,7 @@ angular.module('myApp.view1', [])
                         titles = [{title: titlesObj['rdfs:label']}];
                     }
                     titles.every(function (title) {
-                        if (title.title.includes(vm.filter)) {
+                        if (title && title.title && title.title.includes(vm.filter)) {
                             vm.labelsDBjsonFiltered.subjects.push(titlesObj);
                             return false;
                         }
