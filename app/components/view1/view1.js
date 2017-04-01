@@ -16,6 +16,7 @@ angular.module('myApp.view1', [])
         vm.updateFilter = updateFilter;
         vm.tag = tag;
         vm.removeTag = removeTag;
+        vm.editTag = editTag;
         vm.loadNextText = loadNextText;
         vm.loadPrevText = loadPrevText;
         vm.openText = openText;
@@ -25,8 +26,9 @@ angular.module('myApp.view1', [])
         vm.showContent = showContent;
         vm.translateRegex = translateRegex;
         vm.autoTag = autoTag;
+        vm.autoTagHelper = autoTagHelper;
 
-        vm.log = false;
+        vm.log = true;
         vm.loading = false;
         vm.selectedIndex = 0;
         vm.startOffset = -1;
@@ -57,7 +59,91 @@ angular.module('myApp.view1', [])
         vm.suggestionsClose = suggestionsClose;
         vm.suggestionApply = suggestionApply;
         vm.suggestionDissmiss = suggestionDissmiss;
+        vm.pickTool = pickTool;
+        vm.pickSingleMode = pickSingleMode;
+        vm.removeRegex = removeRegex;
+        vm.removeSubRegex = removeSubRegex;
+        vm.addRegex = addRegex;
+        vm.exportRegex = exportRegex;
         activate();
+
+
+        function exportRegex() {
+            var res = onlineRegexToFile();
+            var data = JSON.stringify({subjects:res}, undefined, 2);
+            var blob = new Blob([data], {type: 'text/json'});
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+              window.navigator.msSaveOrOpenBlob(blob, vm.fileName);
+            }
+            else{
+              var e = document.createEvent('MouseEvents'),
+                  a = document.createElement('a');
+
+              a.download = 'output.json';
+              a.href = window.URL.createObjectURL(blob);
+              a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+              e.initEvent('click', true, false, window,
+                  0, 0, 0, 0, 0, false, false, false, false, 0, null);
+              a.dispatchEvent(e);
+            }
+        }
+        function addRegex() {
+            var newRegex = {};
+            newRegex.regex = [''];
+            newRegex.selectedItem = "uri";
+            newRegex.uri = '';
+            vm.onlineRegexObject['regex-list'].push(newRegex);
+        }
+
+        function removeRegex(i) {
+            vm.onlineRegexObject['regex-list'].splice(i,1);
+        }
+
+        function removeSubRegex(regex, i) {
+            regex.regex.splice(i,1);
+        }
+
+        function pickSingleMode(regex) {
+            if (regex.selectedItem === 'uri')
+            {
+                regex.uri = regex.title;
+                delete regex.title;
+            }
+            else
+            {
+                regex.title = regex.uri;
+                delete regex.uri;
+            }
+        }
+
+        vm.onlineRegexObject = {
+                                    "regex-list" : []
+
+                                };
+
+
+        function onlineRegexToFile() {
+            var res = angular.copy(vm.onlineRegexObject);
+            res['regex-list'].forEach(function (obj) {
+                delete obj.selectedItem;
+            });
+            return res;
+        }
+
+        function fileToOnlineRegex(obj) {
+            obj['regex-list'].forEach(function (obj) {
+                if (obj.uri)
+                {
+                    obj.selectedItem = 'uri';
+                }
+                else
+                {
+                    obj.selectedItem = 'title';
+                }
+            });
+            vm.onlineRegexObject = obj;
+        }
+
 
         //////////////////////////////////////////
 
@@ -81,8 +167,20 @@ angular.module('myApp.view1', [])
         function clearSelection() {
             vm.startOffset = -1;
             vm.endOffset = -1;
-            vm.highlightedText = []
+            vm.highlightedText = {};
         }
+
+        function setSelection(a,b) {
+            vm.startOffset = a;
+            vm.endOffset = b+1;
+
+            vm.highlightedText = {}
+            for (var i = vm.startOffset; i < vm.endOffset; i++ )
+            {
+                vm.highlightedText[i] = true;
+            }
+        }
+
         function loadPrevText() {
             clearSelection();
             if (vm.textNumber > 0) {
@@ -325,13 +423,25 @@ angular.module('myApp.view1', [])
         }
 
         function removeTag(index) {
-        	if (vm.log) console.log("** removeTag (begin) **");
+            if (vm.log) console.log("** removeTag (begin) **");
             var tag = vm.textTags[vm.selectedIndex][index];
             for (var i = tag.startIndex; i <= tag.endIndex; ++i) {
                 vm.textTags[i] = _.without(vm.textTags[i], tag);
             }
             clearSelection();
             if (vm.log) console.log("** removeTag (end) **");
+            return tag;
+        }
+
+        function editTag(index) {
+            if (vm.log) console.log("** editTag (begin) **");
+            var tag = vm.removeTag(index);
+            console.log(tag);
+            setSelection(tag.startIndex,tag.endIndex);
+            updateSelectedText();
+            vm.filter = tag.title;
+            vm.updateFilter();
+            if (vm.log) console.log("** editTag (end) **");
         }
 
         function updateSelectedText() {
@@ -401,7 +511,7 @@ angular.module('myApp.view1', [])
             if (isSelectionValid())
             {
                 var el = document.getElementById('tagNameInput');
-                $timeout(function() {el.focus();}, 10);
+                //$timeout(function() {el.focus();}, 10);
             }
         }
 
@@ -464,6 +574,7 @@ angular.module('myApp.view1', [])
         }
         vm.isTitleSelected = false;
         function tag(titlesObj, force) {
+            console.log(titlesObj)
             if (vm.log) console.log("** tag (begin) **");
             
             for(var i = 0; i < Math.min(10,vm.labelsDBjsonFiltered.subjects.length); ++i)
@@ -532,57 +643,51 @@ angular.module('myApp.view1', [])
 
                  $timeout(function() {
                     var dataObj = JSON.parse(vm.regexContent);
-                    vm.suggestions = [];
-                    dataObj["regex-list"].forEach(function(regObj) {
-                        var suggestions = searchSingleRegEx(regObj.regex, regObj.title);
-                        vm.suggestions = vm.suggestions.concat(suggestions);
-                    });
-                    if (vm.suggestions.length > 0)
-                    {
-                        suggestMode();
-                    }
+                    fileToOnlineRegex(dataObj);
+                    // vm.suggestions = [];
+                    // dataObj["regex-list"].forEach(function(regObj) {
+                    //     regObj.regex.forEach(function(regval) {
+                    //         var suggestions = searchSingleRegEx(regval, regObj.title, regObj.uri);
+                    //         vm.suggestions = vm.suggestions.concat(suggestions);
+                    //     });
+
+                        
+                    // });
+                    // if (vm.suggestions.length > 0)
+                    // {
+                    //     suggestMode();
+                    // }
+                    vm.pickTool('regex');
                  }, 1000);
             });
             el.click();
         }
 
         function autoTag() {
-
-            var el = document.getElementById('regexReaderButton');
-            $("#regexReaderButton").on('change',function(result){
-                vm.fileName = result.target.files[0].name;
-                 
-
-                 $timeout(function() {
-                    var dataObj = JSON.parse(vm.regexContent);
-                    var initialNumber = vm.textNumber;                    
-                    clearSelection();
-                    unloadSingleText();
-                    vm.textNumber = 0;
-                    loadSingleText();
-
-                    do
-                    {
-                        autoTagHelper(dataObj);
-                        loadNextText();
-                    } while (vm.textNumber < vm.texts.length - 1);
-                    autoTagHelper(dataObj);
-                    clearSelection();
-                    unloadSingleText();
-                    vm.textNumber = initialNumber;
-                    loadSingleText();
-                    el.value = "";
-                    
-
-                 }, 1000);
-            });
-            el.click();
+            
+            var initialNumber = vm.textNumber;                    
+            clearSelection();
+            unloadSingleText();
+            vm.textNumber = 0;
+            loadSingleText();
+            do
+            {
+                autoTagHelper();
+                loadNextText();
+            } while (vm.textNumber < vm.texts.length - 1);
+            autoTagHelper();
+            clearSelection();
+            unloadSingleText();
+            vm.textNumber = initialNumber;
+            loadSingleText();
         }
-        function autoTagHelper(dataObj) {
+        function autoTagHelper() {
             vm.suggestions = [];
-            dataObj["regex-list"].forEach(function(regObj) {
-                var suggestions = searchSingleRegEx(regObj.regex, regObj.title);
-                vm.suggestions = vm.suggestions.concat(suggestions);
+            vm.onlineRegexObject["regex-list"].forEach(function(regObj) {
+                regObj.regex.forEach(function(regval) {
+                    var suggestions = searchSingleRegEx(regval, regObj.title, regObj.uri);
+                    vm.suggestions = vm.suggestions.concat(suggestions);
+                });
             });
             if (vm.suggestions.length > 0)
             {
@@ -632,7 +737,7 @@ angular.module('myApp.view1', [])
               var e = document.createEvent('MouseEvents'),
                   a = document.createElement('a');
 
-              a.download = vm.fileName;
+              a.download = 'output.json';
               a.href = window.URL.createObjectURL(blob);
               a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
               e.initEvent('click', true, false, window,
@@ -643,7 +748,7 @@ angular.module('myApp.view1', [])
 
         vm.searchRegEx = "על זה ואמרו";
 
-        function searchSingleRegEx(currRegEx, title) {
+        function searchSingleRegEx(currRegEx, title, uri) {
             var suggestions = [];
             var regex = new RegExp(currRegEx, 'g');
             var m;
@@ -680,10 +785,17 @@ angular.module('myApp.view1', [])
                     suggestion.p3 = partial_3;
                     suggestion.p4 = partial_4;
                     suggestion.p5 = partial_5;
-                    if (title) {
+                    if (uri) {
+                        suggestion.tags = findTagsByUri(uri);
+                    }
+                    else if (title) {
                         suggestion.tags = findTagsByName(title);
                     }
-                    suggestions.push(suggestion);
+                    
+                    if (suggestion.tags.length > 0)
+                    {
+                        suggestions.push(suggestion);
+                    }
                 }
 
             } while(m);
@@ -691,6 +803,7 @@ angular.module('myApp.view1', [])
 
         }
         function suggestTags() {
+            vm.pickTool('tag');
             var text = vm.texts[vm.textNumber];
             var txt;
             if (text.text) {
@@ -867,6 +980,21 @@ angular.module('myApp.view1', [])
             return tags;
         }
 
+        function findTagsByUri(uri) {
+            console.log(uri)
+            var tags = [];
+            vm.labelsDBjson.subjects.forEach(function (titlesObj) {
+                if (titlesObj.uri) {
+                    if (titlesObj.uri === uri) {
+                        tags.push(titlesObj);
+                        return false;
+                    }
+                }
+                return true;
+            });
+            return tags;
+        }
+
         function prepareSave() {
             unloadSingleText();
             vm.savingModalMode = 1;     //1 = show all ; 2 = show only selected
@@ -941,6 +1069,12 @@ angular.module('myApp.view1', [])
                 vm.s = vm.suggestions[vm.currentSuggestion];
             }
             updateSuggestedFilter();
+        }
+
+        vm.tool = 'tag';
+        function pickTool(name) {
+            vm.tool = name;
+            console.log("dffsffds");
         }
 });
 
