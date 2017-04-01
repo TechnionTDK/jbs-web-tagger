@@ -46,7 +46,9 @@
   color: black;
   font-size: 22px;
   cursor: pointer;
-  margin: 0
+  margin: 0;
+  text-align:right;
+  direction:  rtl;
 }
 .tag-selector:hover{
   color: white;
@@ -58,6 +60,9 @@
 
 .tag-selector-selected {
 
+  padding-right:10px;
+  text-align:right;
+  direction:  rtl;
   color: white;
   font-size: 22px;
   cursor: pointer;
@@ -90,13 +95,6 @@
   cursor: pointer;
 }
 
-.tags-div {
-  position:fixed;
-  left: 1%;
-  top: 72px;
-  width: 18.7% !important;
-  
-}
 
 
 .tagged-text {
@@ -145,10 +143,10 @@
 
 .suggest-container {
   position: fixed;
-  top: 20%;
-  left: 20%;
-  height: 60%;
-  width: 60%;
+  top: 106px;
+  left: calc(450px + 15px);
+  height: calc(100% - 200px);
+  width: calc(100% - 450px - 30px);
   background-color: white;
   opacity: 1;
   border: 1px solid black;

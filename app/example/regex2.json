@@ -1,0 +1,17 @@
+{
+	"regex-list" : [
+		{
+			"regex" : ["על זה ואמרו"],
+			"uri" : "jbr:seferhamitzvot-1-1"
+		},
+		{
+			"regex" : ["תאמר"],
+			"title" : "שמות כ ב"
+		},
+		{
+			"regex" : ["כן"],
+			"title" : "שמות כ ב"
+		}
+	]
+
+}

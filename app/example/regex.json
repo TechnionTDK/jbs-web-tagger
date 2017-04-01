@@ -1,15 +1,15 @@
 {
 	"regex-list" : [
 		{
-			"regex" : "על זה ואמרו",
-			"title" : "בראשית ב א"
+			"regex" : ["על זה ואמרו"],
+			"uri" : "jbr:seferhamitzvot-1-1"
 		},
 		{
-			"regex" : "תאמר",
+			"regex" : ["תאמר"],
 			"title" : "שמות כ ב"
 		},
 		{
-			"regex" : "כן",
+			"regex" : ["כן"],
 			"title" : "שמות כ ב"
 		}
 	]
