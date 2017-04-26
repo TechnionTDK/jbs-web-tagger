@@ -508,10 +508,17 @@ angular.module('myApp.view1', [])
             }
             $window.getSelection().removeAllRanges();
             if (vm.log) console.log(isSelectionValid());
+            
             if (isSelectionValid())
             {
                 var el = document.getElementById('tagNameInput');
-                //$timeout(function() {el.focus();}, 10);
+                if (el) $timeout(function() {el.focus();}, 100);
+                else
+                {
+                    vm.pickTool('tag');
+                    
+                    $timeout(function() {var el = document.getElementById('tagNameInput');el.focus();}, 10);
+                }
             }
         }
 

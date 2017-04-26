@@ -112,7 +112,7 @@
                 <br>
                 <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" ng-class="(item.selected) ? 'tag-selector-selected ' : 'tag-selector'" ng-click="vm.tag(item)">
                     <span ng-if="item['rdfs:label']">{{item['rdfs:label']}}</span>
-                    <span ng-if="item.titles && !item['rdfs:label']">{{item.titles[0]}}</span>
+                    <span ng-if="item.titles && !item['rdfs:label']">{{item.titles[0].title}}</span>
                 </p>
             </div>
         </div>
