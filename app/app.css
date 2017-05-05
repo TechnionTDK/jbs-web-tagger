@@ -184,3 +184,13 @@
   z-index: 10;
   background-color: white
 }
+
+.uri-box-clear {
+  position: absolute;
+  left:48px;
+  top: 15px;
+  color:gray;
+  font-size: 20px;
+  font-weight:lighter;
+  cursor:pointer;
+}

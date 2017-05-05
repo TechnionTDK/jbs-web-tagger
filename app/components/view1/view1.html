@@ -107,7 +107,9 @@
         <div class="tags-panel" ng-if="vm.tool == 'tag'">
             <div class="text-center tags-div focused-z" id="tagsDiv">
                 <label>
+
                     <input ng-disabled="!vm.isSelectionValid() && !vm.suggestMode" id="tagNameInput" name="tagNameInput" type="text" ng-model="vm.filter" class="labels-filter" ng-change="vm.updateFilter()"/>
+                    <i class="glyphicon glyphicon-remove uri-box-clear" ng-click="vm.clearURI()"></i>
                 </label>
                 <br>
                 <p ng-repeat="item in vm.labelsDBjsonFiltered.subjects | limitTo : 10" ng-class="(item.selected) ? 'tag-selector-selected ' : 'tag-selector'" ng-click="vm.tag(item)">
@@ -121,7 +123,7 @@
             <div class="paging-button-left text-center" ng-click="vm.loadPrevText()"><span class="glyphicon glyphicon-step-backward"></span><br>Prev</div>
             <div class="paging-text">
                     <span class="main-text">{{vm.textNumber + 1}}</span><br>
-                    <span class="sub-text">{{vm.texts[vm.textNumber].titles[0].title}}</span>
+                    <span class="sub-text">{{vm.texts[vm.textNumber].titles[0]}}</span>
             </div>
             <div class="paging-button-right text-center" ng-click="vm.loadNextText()"><span class="glyphicon glyphicon-step-forward"></span><br>Next</div>
         </div>

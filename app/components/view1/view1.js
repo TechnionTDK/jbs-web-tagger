@@ -65,8 +65,15 @@ angular.module('myApp.view1', [])
         vm.removeSubRegex = removeSubRegex;
         vm.addRegex = addRegex;
         vm.exportRegex = exportRegex;
+
+        vm.clearURI = clearURI;
         activate();
 
+        function clearURI() {
+            if (!vm.isSelectionValid() && !vm.suggestMode) return;
+            vm.filter = "";
+            vm.updateFilter();
+        }
 
         function exportRegex() {
             var res = onlineRegexToFile();
@@ -260,7 +267,7 @@ angular.module('myApp.view1', [])
         }
 
         function isSelectionValid() {
-        	if (vm.log) console.log("** isSelectionValid (begin) **");
+        	//if (vm.log) console.log("** isSelectionValid (begin) **");
             return vm.startOffset >= 0 && vm.endOffset >= 0;
         }
 
@@ -508,10 +515,17 @@ angular.module('myApp.view1', [])
             }
             $window.getSelection().removeAllRanges();
             if (vm.log) console.log(isSelectionValid());
+            
             if (isSelectionValid())
             {
                 var el = document.getElementById('tagNameInput');
-                //$timeout(function() {el.focus();}, 10);
+                if (el) $timeout(function() {el.focus();}, 100);
+                else
+                {
+                    vm.pickTool('tag');
+                    
+                    $timeout(function() {var el = document.getElementById('tagNameInput');el.focus();}, 10);
+                }
             }
         }
 
